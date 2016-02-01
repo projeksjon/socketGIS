@@ -1,0 +1,58 @@
+
+
+// ------------ Variables ---------------
+
+//Container
+$so-file-container-bg: #eee
+$so-file-container-padding: 10px
+$so-file-container-padding-top: 100px + $so-file-container-padding
+$so-file-container-padding-left: 300px + $so-file-container-padding
+
+//File
+$so-file-bg: #fff
+$so-file-width: 300px
+$so-file-padding: 10px
+$so-file-picture-height: $so-file-width/2
+
+.so-file-container
+  width: 100%
+  text-align: center
+  min-height: 100vh
+
+  padding: $so-file-container-padding
+  padding-top: $so-file-container-padding-top
+  padding-left: $so-file-container-padding-left
+  background: $so-file-container-bg
+
+  .so-file
+
+    display: inline-block
+    margin: 20px
+    transition: 0.15s
+    text-align: left
+    cursor: pointer
+
+    width: $so-file-width
+    padding: $so-file-padding
+    background: $so-file-bg
+
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.1)
+
+    &:hover
+      background: darken($so-file-bg, 3%)
+
+
+    .so-file-picture
+      width: 100%
+      height: $so-file-picture-height
+
+      display: block
+      background-position: center center
+      background-size: cover
+
+
+    .so-file-info
+
+
+
+

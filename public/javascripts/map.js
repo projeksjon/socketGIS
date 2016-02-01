@@ -84,16 +84,18 @@ var sidebar = $('#sidebar').sidebar();
 var geoJSONFormat = new ol.format.GeoJSON();
 
 //Add reference to drawing select
+/*
 var typeSelect = document.getElementById('type');
 
 typeSelect.onchange = function(e) {
     map.removeInteraction(draw);
     addInteraction();
 };
+*/
 
 var draw; // global so we can remove it later
 function addInteraction() {
-    var value = typeSelect.value;
+    var value = 'None';
     if (value !== 'None') {
         var geometryFunction, maxPoints;
         if (value === 'Square') {

@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "so-text-style.css",
+	"sources": [
+		"so-text-style.sass"
+	],
+	"mappings": "AAEA,QAAQ,CAAC;EACP,WAAW,EAAE,GAAI,GAAG;;AAItB,SAAS,CAAC;EACR,cAAc,EAAE,SAAU,GAAG",
+	"names": []
+}

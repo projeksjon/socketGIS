@@ -1,0 +1,62 @@
+.so-nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100px;
+  background: #d00000; }
+  .so-nav .brand {
+    float: left;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box; }
+    .so-nav .brand img {
+      height: 100%; }
+
+.so-side-nav {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  bottom: 0;
+  width: 300px;
+  padding-top: 30px;
+  background: #333;
+  color: #93959E;
+  z-index: 1; }
+  .so-side-nav ul {
+    list-style-type: none;
+    padding-left: 0; }
+    .so-side-nav ul a {
+      text-decoration: none; }
+    .so-side-nav ul li {
+      padding: 16px 30px 16px 30px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 400;
+      font-size: 9pt;
+      transition: 0.15s;
+      color: #93959E; }
+      .so-side-nav ul li:hover {
+        background: #555; }
+      .so-side-nav ul li i {
+        padding-right: 10px; }
+  .so-side-nav .so-side-nav-logo {
+    width: 100%;
+    margin-bottom: 20px; }
+    .so-side-nav .so-side-nav-logo img {
+      display: block;
+      margin: 0 auto;
+      width: 30%; }
+  .so-side-nav .active {
+    background: linear-gradient(to bottom, #d00000 0%, #9d0000 100%);
+    color: #fff; }
+    .so-side-nav .active:hover {
+      background: linear-gradient(to bottom, #ea0000 0%, #b70000 100%); }
+
+.has-side-nav {
+  padding-top: 100px;
+  padding-left: 300px; }
+
+.has-nav {
+  padding-top: 100px; }
+
+/*# sourceMappingURL=so-nav.css.map */

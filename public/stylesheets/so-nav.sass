@@ -1,0 +1,101 @@
+
+//Variables
+
+//Padding
+$so-container-padding-top: 100px
+$so-container-padding-left: 300px
+
+$so-main-color: rgb(208, 0, 0)
+
+.so-nav
+  position: fixed
+  top: 0
+  width: 100%
+  height: 100px
+
+  background: $so-main-color
+
+  .brand
+    float: left
+    height: 100%
+    padding: 20px
+
+    //For some reason the padding increased the div height
+    box-sizing: border-box
+
+    img
+      height: 100%
+
+
+
+
+.so-side-nav
+  position: fixed
+  top: 100px
+  left: 0
+  bottom: 0
+  width: 300px
+
+  padding-top: 30px
+
+  background: #333
+  color: #93959E
+
+  z-index: 1
+
+  ul
+
+    list-style-type: none
+    padding-left: 0
+
+    a
+      text-decoration: none
+
+
+    li
+      padding: 16px 30px 16px 30px
+      text-transform: uppercase
+      letter-spacing: 3px
+      font-weight: 400
+      font-size: 9pt
+      transition: 0.15s
+      color: #93959E
+
+      &:hover
+        background: #555
+
+
+      i
+        padding-right: 10px
+
+
+
+
+  .so-side-nav-logo
+
+    width: 100%
+    margin-bottom: 20px
+
+    img
+      display: block
+      margin: 0 auto
+      width: 30%
+
+
+
+  .active
+    background: linear-gradient(to bottom, $so-main-color 0%,darken($so-main-color, 10%) 100%)
+    color: #fff
+
+    &:hover
+      background: linear-gradient(to bottom, lighten($so-main-color, 5%) 0%,darken($so-main-color, 5%) 100%)
+
+
+
+
+.has-side-nav
+  padding-top: $so-container-padding-top
+  padding-left: $so-container-padding-left
+
+.has-nav
+  padding-top: $so-container-padding-top
