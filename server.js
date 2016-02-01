@@ -24,6 +24,8 @@ app.use(require('node-sass-middleware')({
     indentedSyntax: true,
     sourceMap: true
 }));
+
+//Serve the static folder and the index file
 app.use(express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler

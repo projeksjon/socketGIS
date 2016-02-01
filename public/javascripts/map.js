@@ -2,7 +2,6 @@
  * Created by rubenschmidt on 07.12.2015.
  */
 
-
 var drawSource = new ol.source.Vector({wrapX: false});
 var vectorSource = new ol.source.Vector({wrapX: false});
 
