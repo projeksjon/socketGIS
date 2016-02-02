@@ -1,6 +1,6 @@
 /**
  * Created by rubenschmidt on 01.02.2016.
- */
+*/
 
 socketGis.controller("mapController", function ($scope, $http) {
     var map = init();
