@@ -7,6 +7,12 @@ $so-container-padding-left: 300px
 
 $so-main-color: rgb(208, 0, 0)
 
+
+//Side nav
+$so-side-nav-small-width: 60px
+$so-side-nav-small-button-height: $so-side-nav-small-width
+$so-container-padding-left-small: $so-side-nav-small-width
+
 .so-nav
   position: fixed
   top: 0
@@ -62,8 +68,7 @@ $so-main-color: rgb(208, 0, 0)
       color: #93959E
 
       &:hover
-        background: #555
-
+        background: #444
 
       i
         padding-right: 10px
@@ -81,8 +86,6 @@ $so-main-color: rgb(208, 0, 0)
       margin: 0 auto
       width: 30%
 
-
-
   .active
     background: linear-gradient(to bottom, $so-main-color 0%,darken($so-main-color, 10%) 100%)
     color: #fff
@@ -90,12 +93,36 @@ $so-main-color: rgb(208, 0, 0)
     &:hover
       background: linear-gradient(to bottom, lighten($so-main-color, 5%) 0%,darken($so-main-color, 5%) 100%)
 
+.so-side-nav-small
+  width: $so-side-nav-small-width
+  border-right: 1px solid #93959E
+  padding-top: 0
 
+  button
+    //Fixed style
+    width: 100%
+    border: 0
+    border-bottom: 1px solid #93959E
+    background: 0
+    transition: 0.15s
 
+    //Variable style
+    height: $so-side-nav-small-button-height
+    font-size: 18px
 
-.has-side-nav
-  padding-top: $so-container-padding-top
-  padding-left: $so-container-padding-left
+    &:hover
+      background: #444
+
+    &:focus
+      outline: none
+      background: #555
+
 
 .has-nav
   padding-top: $so-container-padding-top
+
+.has-side-nav
+  padding-left: $so-container-padding-left
+
+.has-side-nav-small
+  padding-left: $so-container-padding-left-small

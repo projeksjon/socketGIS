@@ -36,7 +36,7 @@
       transition: 0.15s;
       color: #93959E; }
       .so-side-nav ul li:hover {
-        background: #555; }
+        background: #444; }
       .so-side-nav ul li i {
         padding-right: 10px; }
   .so-side-nav .so-side-nav-logo {
@@ -52,11 +52,31 @@
     .so-side-nav .active:hover {
       background: linear-gradient(to bottom, #ea0000 0%, #b70000 100%); }
 
-.has-side-nav {
-  padding-top: 100px;
-  padding-left: 300px; }
+.so-side-nav-small {
+  width: 60px;
+  border-right: 1px solid #93959E;
+  padding-top: 0; }
+  .so-side-nav-small button {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #93959E;
+    background: 0;
+    transition: 0.15s;
+    height: 60px;
+    font-size: 18px; }
+    .so-side-nav-small button:hover {
+      background: #444; }
+    .so-side-nav-small button:focus {
+      outline: none;
+      background: #555; }
 
 .has-nav {
   padding-top: 100px; }
+
+.has-side-nav {
+  padding-left: 300px; }
+
+.has-side-nav-small {
+  padding-left: 60px; }
 
 /*# sourceMappingURL=so-nav.css.map */

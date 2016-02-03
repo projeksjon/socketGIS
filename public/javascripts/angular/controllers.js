@@ -36,6 +36,11 @@ function init() {
         })
     });
 
+    var view = new ol.View({
+        center: ol.proj.transform([10.3933, 63.4297], 'EPSG:4326', 'EPSG:3857'),
+        zoom: 13
+    });
+
     var map = new ol.Map({
         target: 'map',
         layers: [
@@ -43,10 +48,42 @@ function init() {
                 source: new ol.source.OSM()
             }),
             vector, saved],
-        view: new ol.View({
-            center: ol.proj.transform([10.3933, 63.4297], 'EPSG:4326', 'EPSG:3857'),
-            zoom: 13
+        view: view
+    });
+
+    var geolocation = new ol.Geolocation({
+        projection: view.getProjection()
+    });
+
+    var accuracyFeature = new ol.Feature();
+    geolocation.on('change:accuracyGeometry', function() {
+        accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    });
+
+    var positionFeature = new ol.Feature();
+    positionFeature.setStyle(new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 6,
+            fill: new ol.style.Fill({
+                color: '#3399CC'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#fff',
+                width: 2
+            })
+        })
+    }));
+
+    var coordinates = geolocation.getPosition();
+    positionFeature.setGeometry(coordinates ?
+        new ol.geom.Point(coordinates) : null);
+
+    new ol.layer.Vector({
+        map: map,
+        source: new ol.source.Vector({
+            features: [accuracyFeature, positionFeature]
         })
     });
+
     return map;
 }
