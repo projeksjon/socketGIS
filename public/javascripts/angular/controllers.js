@@ -2,23 +2,71 @@
  * Created by rubenschmidt on 01.02.2016.
 */
 
+var geoJSONFormat = new ol.format.GeoJSON();
+
 socketGis.controller("mapController", function ($scope, $http) {
-    var map = init();
+    $scope.map = init($scope);
+
+    $scope.interactionTypes = ['None', 'Point', 'LineString', 'Polygon', 'Circle', 'Square', 'Box'];
+    $scope.interactionType = 'None';
+
+    $scope.show = {
+        slider: false
+    }
+
+    // Functions
+    $scope.toggleSlider = function() {
+        $scope.show.slider = ($scope.show.slider) ? false : true;
+    }
+
+    $scope.addInteraction = function addInteraction() {
+        var value = $scope.interactionType;
+        if (value !== 'None') {
+            var geometryFunction, maxPoints;
+            if (value === 'Square') {
+                value = 'Circle';
+                geometryFunction = ol.interaction.Draw.createRegularPolygon(4);
+            } else if (value === 'Box') {
+                value = 'LineString';
+                maxPoints = 2;
+                geometryFunction = function(coordinates, geometry) {
+                    if (!geometry) {
+                        geometry = new ol.geom.Polygon(null);
+                    }
+                    var start = coordinates[0];
+                    var end = coordinates[1];
+                    geometry.setCoordinates([
+                        [start, [start[0], end[1]], end, [end[0], start[1]], start]
+                    ]);
+                    return geometry;
+                };
+            }
+            draw = new ol.interaction.Draw({
+                source: $scope.drawSource,
+                type: /** @type {ol.geom.GeometryType} */ (value),
+                geometryFunction: geometryFunction,
+                maxPoints: maxPoints
+            });
+            $scope.map.addInteraction(draw);
+            //When finished drawing
+            draw.on('drawend', saveDrawing);
+        }
+    }
 
 });
 
-function init() {
-    var drawSource = new ol.source.Vector({wrapX: false});
-    var vectorSource = new ol.source.Vector({wrapX: false});
+function init($scope) {
+    $scope.drawSource = new ol.source.Vector({wrapX: false});
+    $scope.vectorSource = new ol.source.Vector({wrapX: false});
 
     //Layer for dbFeatures
     var saved = new ol.layer.Vector({
-        source: vectorSource
+        source: $scope.vectorSource
     });
 
     //Layer for drawing
     var vector = new ol.layer.Vector({
-        source: drawSource,
+        source: $scope.drawSource,
         style: new ol.style.Style({
             fill: new ol.style.Fill({
                 color: 'rgba(255, 255, 255, 0.2)'
@@ -51,39 +99,75 @@ function init() {
         view: view
     });
 
-    var geolocation = new ol.Geolocation({
-        projection: view.getProjection()
+    //WEBSOCKET ONS BELOW
+    //On start of connection, the server sends the stored points. TODO change this.
+    socket.on('all points', function(points){
+        points.forEach(function(point){
+            //Create valid geojson
+            var p =  turf.point(point.loc.coordinates);
+            //read the geojson and make a feature of it
+            var feature = geoJSONFormat.readFeature(p, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
+            feature.setId(point._id);
+            //Add feature to vectorlayer drawSource
+            $scope.vectorSource.addFeature(feature);
+        })
     });
 
-    var accuracyFeature = new ol.Feature();
-    geolocation.on('change:accuracyGeometry', function() {
-        accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    socket.on('all lines', function(lines){
+        lines.forEach(function(line){
+            var l =  turf.linestring(line.loc.coordinates);
+            var feature = geoJSONFormat.readFeature(l, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
+            feature.setId(line._id);
+            //Add feature to vectorlayer drawSource
+            $scope.vectorSource.addFeature(feature);
+        })
     });
 
-    var positionFeature = new ol.Feature();
-    positionFeature.setStyle(new ol.style.Style({
-        image: new ol.style.Circle({
-            radius: 6,
-            fill: new ol.style.Fill({
-                color: '#3399CC'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#fff',
-                width: 2
-            })
+    socket.on('all polys', function(polys){
+        polys.forEach(function(poly){
+            var p =  turf.polygon(poly.loc.coordinates);
+            var feature = geoJSONFormat.readFeature(p, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
+            feature.setId(poly._id);
+            $scope.vectorSource.addFeature(feature);
         })
-    }));
+    });
 
-    var coordinates = geolocation.getPosition();
-    positionFeature.setGeometry(coordinates ?
-        new ol.geom.Point(coordinates) : null);
 
-    new ol.layer.Vector({
-        map: map,
-        source: new ol.source.Vector({
-            features: [accuracyFeature, positionFeature]
-        })
+    socket.on('new point', function(point){
+
+    });
+
+    socket.on('done buffering', function(geom){
+        var geometry = geoJSONFormat.readGeometry(geom);
+        console.log(geometry);
+        var feature = new ol.Feature({'geometry': geometry});
+        $scope.vectorSource.addFeature(feature);
+        //Write the buffer in right format for database and send it.
+        var geoObject = geoJSONFormat.writeFeatureObject(feature, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
+        socket.emit('add poly', geoObject);
     });
 
     return map;
+}
+
+function saveDrawing(event){
+    var feature = event.feature;
+    //Write the feature to a geojsonobject.
+    var geoObject = geoJSONFormat.writeFeatureObject(feature, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
+    switch (geoObject.geometry.type){
+        case 'Point':
+            socket.emit('add point',geoObject);
+            break;
+        case 'LineString':
+            socket.emit('add line', geoObject);
+            break;
+        case 'Polygon':
+            socket.emit('add poly', geoObject);
+            break;
+        case 'GeometryCollection':
+            console.log('geometry collection not ready');
+            break;
+        default:
+            console.log('Not defined feature');
+    }
 }

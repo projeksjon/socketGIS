@@ -95,7 +95,7 @@ typeSelect.onchange = function(e) {
 
 var draw; // global so we can remove it later
 function addInteraction() {
-    var value = 'None';
+    var value = 'Point';
     if (value !== 'None') {
         var geometryFunction, maxPoints;
         if (value === 'Square') {

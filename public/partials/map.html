@@ -58,9 +58,15 @@
     </div>
 </div>-->
 <nav class="so-side-nav so-side-nav-small">
-    <button><i class = "glyphicon glyphicon-plus"></i></button>
-    <button><i class = "glyphicon glyphicon-comment"></i></button>
-    <button><i class = "glyphicon glyphicon-cog"></i></button>
+    <button ng-click="toggleSlider()"><i class = "glyphicon glyphicon-plus"></i></button>
+    <button ng-click="toggleSlider()"><i class = "glyphicon glyphicon-comment"></i></button>
+    <button ng-click="toggleSlider()"><i class = "glyphicon glyphicon-cog"></i></button>
+    <div class="so-side-nav-small-slider" ng-class="{'slider-active': show.slider}">
+        <div class="so-side-nav-small-slider-container">
+            <h1>Hello world</h1>
+            <select ng-model="interactionType" ng-change="addInteraction()" ng-options="interactionType for interactionType in interactionTypes"></select>
+        </div>
+    </div>
 </nav>
 <div class="has-nav has-side-nav-small so-container">
     <div id="map"></div>

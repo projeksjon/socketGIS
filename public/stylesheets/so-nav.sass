@@ -1,5 +1,8 @@
 
+@import "mixins"
+
 //Variables
+
 
 //Padding
 $so-container-padding-top: 100px
@@ -7,6 +10,8 @@ $so-container-padding-left: 300px
 
 $so-main-color: rgb(208, 0, 0)
 
+// Nav
+$so-nav-height: 100px
 
 //Side nav
 $so-side-nav-small-width: 60px
@@ -17,7 +22,7 @@ $so-container-padding-left-small: $so-side-nav-small-width
   position: fixed
   top: 0
   width: 100%
-  height: 100px
+  height: $so-nav-height
 
   background: $so-main-color
 
@@ -117,6 +122,27 @@ $so-container-padding-left-small: $so-side-nav-small-width
       outline: none
       background: #555
 
+  .so-side-nav-small-slider
+    position: fixed
+    top: $so-nav-height
+    left: $so-side-nav-small-width
+    bottom: 0
+    width: 0
+    background: #333
+    overflow: hidden
+
+    @include trans(width, 500ms)
+
+    .so-side-nav-small-slider-container
+      padding: 20px
+      width: 300px
+
+      select
+        width: 100%
+
+
+  .slider-active
+    width: 300px
 
 .has-nav
   padding-top: $so-container-padding-top
