@@ -30,5 +30,4 @@ socketGis.controller('registerController',
                     });
 
             };
-
 }]);
