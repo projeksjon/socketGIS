@@ -125,6 +125,8 @@ function addInteraction() {
         map.addInteraction(draw);
         //When finished drawing
         draw.on('drawend', saveDrawing);
+    }else {
+        map.removeInteraction(draw);
     }
 }
 

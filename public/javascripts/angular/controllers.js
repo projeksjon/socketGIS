@@ -12,12 +12,12 @@ socketGis.controller("mapController", function ($scope, $http) {
 
     $scope.show = {
         slider: false
-    }
+    };
 
     // Functions
     $scope.toggleSlider = function() {
-        $scope.show.slider = ($scope.show.slider) ? false : true;
-    }
+        $scope.show.slider = (!$scope.show.slider);
+    };
 
     $scope.addInteraction = function addInteraction() {
         var value = $scope.interactionType;
@@ -50,9 +50,72 @@ socketGis.controller("mapController", function ($scope, $http) {
             $scope.map.addInteraction(draw);
             //When finished drawing
             draw.on('drawend', saveDrawing);
+        }else {
+            //None is selected, we remove the current selected drawing type
+            $scope.map.removeInteraction(draw);
         }
-    }
+    };
 
+    $scope.deleteSelected = function deleteSelected(){
+        $scope.selectedFeatures.forEach(function(feature){
+            var id = feature.getId();
+            console.log(id);
+            var type =  geoJSONFormat.writeFeatureObject(feature).geometry.type;
+            switch (type){
+                case 'Point':
+                    socket.emit('delete point',id);
+                    break;
+                case 'LineString':
+                    socket.emit('delete line', id);
+                    break;
+                case 'Polygon':
+                    socket.emit('delete poly', id);
+                    break;
+                case 'GeometryCollection':
+                    console.log('geometry collection not ready');
+                    break;
+                default:
+                    console.log('Not defined feature');
+            }
+            if(vectorSource.getFeatureById(id)) {
+                $scope.vectorSource.removeFeature(feature);
+            }
+            if(drawSource.getFeatureById(id)){
+                $scope.drawSource.removeFeature(feature);
+            }
+            $scope.selectedFeatures.clear();
+        });
+    };
+
+
+    // a normal select interaction to handle click on features
+    var select = new ol.interaction.Select();
+    $scope.map.addInteraction(select);
+
+//Get the selected features
+    $scope.selectedFeatures = select.getFeatures();
+
+    $scope.map.on('click', function() {
+        console.log("click");
+        $scope.selectedFeatures.clear();
+    });
+
+    // a DragBox interaction used to select features by drawing boxes while holding, cmd og ctrl
+     $scope.dragBox = new ol.interaction.DragBox({
+        condition: ol.events.condition.platformModifierKeyOnly
+    });
+
+    $scope.map.addInteraction($scope.dragBox);
+
+    $scope.dragBox.on('boxend', function(e) {
+        // features that intersect the box are added to the collection of
+        // selected features
+        var extent = $scope.dragBox.getGeometry().getExtent();
+        $scope.vectorSource.forEachFeatureIntersectingExtent(extent, function(feature) {
+            $scope.selectedFeatures.push(feature);
+        });
+
+    });
 });
 
 function init($scope) {
@@ -107,6 +170,7 @@ function init($scope) {
             var p =  turf.point(point.loc.coordinates);
             //read the geojson and make a feature of it
             var feature = geoJSONFormat.readFeature(p, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
+            //Set id for easy retrieval
             feature.setId(point._id);
             //Add feature to vectorlayer drawSource
             $scope.vectorSource.addFeature(feature);
