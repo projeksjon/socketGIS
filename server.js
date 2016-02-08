@@ -40,10 +40,11 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 
+mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
+
 if (app.get('env') === 'development') {
     //Connect to dev db.
     //mongoose.connect('mongodb://localhost:27017/gisdb');
-    mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
 }
 
 // production error handler

@@ -200,7 +200,7 @@ function deleteSelected(){
 
 
 //WEBSOCKET ONS BELOW
-//On start of connection, the server sends the stored points. TODO change this.
+//On start of connection, the server sends the stored points. TODO change this so it only loads the team.
 socket.on('all points', function(points){
     points.forEach(function(point){
         //Create valid geojson
