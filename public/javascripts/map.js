@@ -209,7 +209,7 @@ socket.on('all points', function(points){
         var feature = geoJSONFormat.readFeature(p, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
         feature.setId(point._id);
         //Add feature to vectorlayer drawSource
-        vectorSource.addFeature(feature);
+        $scope.vectorSource.addFeature(feature);
     })
 });
 
@@ -219,7 +219,7 @@ socket.on('all lines', function(lines){
         var feature = geoJSONFormat.readFeature(l, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
         feature.setId(line._id);
         //Add feature to vectorlayer drawSource
-        vectorSource.addFeature(feature);
+        $scope.vectorSource.addFeature(feature);
     })
 });
 
@@ -228,7 +228,7 @@ socket.on('all polys', function(polys){
        var p =  turf.polygon(poly.loc.coordinates);
        var feature = geoJSONFormat.readFeature(p, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
        feature.setId(poly._id);
-       vectorSource.addFeature(feature);
+       $scope.vectorSource.addFeature(feature);
    })
 });
 
@@ -241,7 +241,7 @@ socket.on('done buffering', function(geom){
     var geometry = geoJSONFormat.readGeometry(geom);
     console.log(geometry);
     var feature = new ol.Feature({'geometry': geometry});
-    vectorSource.addFeature(feature);
+    $scope.vectorSource.addFeature(feature);
     //Write the buffer in right format for database and send it.
     var geoObject = geoJSONFormat.writeFeatureObject(feature, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
     socket.emit('add poly', geoObject);

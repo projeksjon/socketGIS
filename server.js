@@ -39,9 +39,11 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
+
 if (app.get('env') === 'development') {
     //Connect to dev db.
-    mongoose.connect('mongodb://localhost:27017/gisdb');
+    //mongoose.connect('mongodb://localhost:27017/gisdb');
+    mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
 }
 
 // production error handler
@@ -50,6 +52,7 @@ app.use(function(err, req, res, next) {
 
 });
 
+//============MONGO==============
 
 var geoFeature = new Schema({
     loc: {
@@ -59,8 +62,11 @@ var geoFeature = new Schema({
         coordinates:[]
     }
 });
+// Set the index so we can use spatial queries.
 geoFeature.index({ loc: "2dsphere" });
 
+
+//Define models
 var Point = mongoose.model('Point', geoFeature);
 var Polygon = mongoose.model('Polygon', geoFeature);
 var LineString = mongoose.model('LineString', geoFeature);
@@ -88,8 +94,9 @@ io.on('connection', function(socket){
         Point.create({loc: {type:'Point', coordinates: point.geometry.coordinates}}, function (err, point){
             //Catch the error.
             if (err) console.log(err);
+            //Send to all others than the sender
             socket.broadcast.emit('new point', point);
-            console.log('added');
+            console.log('added point');
         });
     });
 
@@ -139,10 +146,12 @@ io.on('connection', function(socket){
 
 });
 
+
+//===================GIS Methods===================
+
 //JSTS parser to read geojson ++
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
-
 
 
 function makeBuffer(feature, distance){
