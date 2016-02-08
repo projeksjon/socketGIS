@@ -5,11 +5,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 var app = express();
 var cors = require("cors");
 var io = require('./io');
 var jsts = require("jsts");
+var passport = require("passport-local");
 
 app.use(cors());
 
@@ -24,24 +24,15 @@ app.use(require('node-sass-middleware')({
     indentedSyntax: true,
     sourceMap: true
 }));
-
 //Serve the static folder and the index file
 app.use(express.static(path.join(__dirname, 'public')));
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-
 mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
-
 if (app.get('env') === 'development') {
     //Connect to dev db.
     //mongoose.connect('mongodb://localhost:27017/gisdb');
@@ -53,24 +44,24 @@ app.use(function(err, req, res, next) {
 
 });
 
+// POST method route
+app.post('/register', function (req, res) {
+    User.register(new User({ username: req.body.username }), req.body.password, function(err, account) {
+        if (err) {
+            return res.status(500).json({err: err});
+        }
+        passport.authenticate('local')(req, res, function () {
+            return res.status(200).json({status: 'Registration successful!'});
+        });
+    });
+});
+
 //============MONGO==============
 
-var geoFeature = new Schema({
-    loc: {
-        type: {
-            type: String,
-            enum: ["Point", "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon"]},
-        coordinates:[]
-    }
-});
-// Set the index so we can use spatial queries.
-geoFeature.index({ loc: "2dsphere" });
-
-
 //Define models
-var Point = mongoose.model('Point', geoFeature);
-var Polygon = mongoose.model('Polygon', geoFeature);
-var LineString = mongoose.model('LineString', geoFeature);
+var Point = require('./models/point.js');
+var Polygon = require('./models/polygon.js');
+var LineString = require('./models/linestring.js');
 
 function sendData(){
     console.log('Sent data');
