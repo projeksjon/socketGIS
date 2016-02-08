@@ -24,7 +24,7 @@ socketGis.controller('loginController',
                     // handle error
                     .catch(function () {
                         $scope.error = true;
-                        $scope.errorMessage = "Invalid username and/or password";
+                        $scope.errorMessage = "Feil brukernavn eller passord";
                         $scope.disabled = false;
                         $scope.loginForm = {};
                     });

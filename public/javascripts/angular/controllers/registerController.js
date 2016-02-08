@@ -24,7 +24,7 @@ socketGis.controller('registerController',
                     // handle error
                     .catch(function () {
                         $scope.error = true;
-                        $scope.errorMessage = "Something went wrong!";
+                        $scope.errorMessage = "Uh oh! Noe gikk galt!";
                         $scope.disabled = false;
                         $scope.registerForm = {};
                     });
