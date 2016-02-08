@@ -116,50 +116,29 @@ socketGis.controller("mapController", function ($scope, $http) {
         });
 
     });
-});
 
-function init($scope) {
-    $scope.drawSource = new ol.source.Vector({wrapX: false});
-    $scope.vectorSource = new ol.source.Vector({wrapX: false});
-
-    //Layer for dbFeatures
-    var saved = new ol.layer.Vector({
-        source: $scope.vectorSource
-    });
-
-    //Layer for drawing
-    var vector = new ol.layer.Vector({
-        source: $scope.drawSource,
-        style: new ol.style.Style({
+    //Marker for geolocation
+    $scope.positionFeature = new ol.Feature();
+    $scope.positionFeature.setStyle(new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 6,
             fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
+                color: '#3399CC'
             }),
             stroke: new ol.style.Stroke({
-                color: '#ffcc33',
+                color: '#fff',
                 width: 2
-            }),
-            image: new ol.style.Circle({
-                radius: 7,
-                fill: new ol.style.Fill({
-                    color: '#ffcc33'
-                })
             })
         })
-    });
+    }));
+    //Add the feature to the map
+    $scope.vectorSource.addFeature($scope.positionFeature);
 
-    var view = new ol.View({
-        center: ol.proj.transform([10.3933, 63.4297], 'EPSG:4326', 'EPSG:3857'),
-        zoom: 13
-    });
-
-    var map = new ol.Map({
-        target: 'map',
-        layers: [
-            new ol.layer.Tile({
-                source: new ol.source.OSM()
-            }),
-            vector, saved],
-        view: view
+    //On change create the marker
+    $scope.geolocation.on('change:position', function() {
+        var coordinates = $scope.geolocation.getPosition();
+        $scope.positionFeature.setGeometry(coordinates ?
+            new ol.geom.Point(coordinates) : null);
     });
 
     //WEBSOCKET ONS BELOW
@@ -210,6 +189,59 @@ function init($scope) {
         var geoObject = geoJSONFormat.writeFeatureObject(feature, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
         socket.emit('add poly', geoObject);
     });
+
+});
+
+function init($scope) {
+    $scope.drawSource = new ol.source.Vector({wrapX: false});
+    $scope.vectorSource = new ol.source.Vector({wrapX: false});
+
+    //Layer for dbFeatures
+    var saved = new ol.layer.Vector({
+        source: $scope.vectorSource
+    });
+
+    //Layer for drawing
+    var vector = new ol.layer.Vector({
+        source: $scope.drawSource,
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.2)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ffcc33',
+                width: 2
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                })
+            })
+        })
+    });
+
+    var view = new ol.View({
+        center: ol.proj.transform([10.3933, 63.4297], 'EPSG:4326', 'EPSG:3857'),
+        zoom: 13
+    });
+
+    var map = new ol.Map({
+        target: 'map',
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.OSM()
+            }),
+            vector, saved],
+        view: view
+    });
+
+     $scope.geolocation = new ol.Geolocation({
+        // take the projection to use from the map's view
+        projection: view.getProjection()
+    });
+
+    $scope.geolocation.setTracking(true);
 
     return map;
 }
