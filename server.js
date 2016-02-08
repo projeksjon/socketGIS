@@ -5,63 +5,71 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var app = express();
 var cors = require("cors");
 var io = require('./io');
 var jsts = require("jsts");
-var passport = require("passport-local");
+var passport = require('passport');
+
+//Mongoose
+mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
+var User = require('./models/user.js');
+var Point = require('./models/point.js');
+var Polygon = require('./models/polygon.js');
+var LineString = require('./models/linestring.js');
+
+//Create instance of express
+var app = express();
+
+// require routes
+var routes = require('./routes/api.js');
 
 app.use(cors());
-
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(require('express-session')({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+//Serve the static folder and the index file
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(require('node-sass-middleware')({
     src: path.join(__dirname, 'public'),
     dest: path.join(__dirname, 'public'),
     indentedSyntax: true,
     sourceMap: true
 }));
-//Serve the static folder and the index file
-app.use(express.static(path.join(__dirname, 'public')));
+// configure passport
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+// routes
+app.use('/user/', routes);
+
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    var err = new Error('Not Found');
+    var err = new Error('Ikke funnet');
     err.status = 404;
     next(err);
 });
-mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
+
 if (app.get('env') === 'development') {
     //Connect to dev db.
     //mongoose.connect('mongodb://localhost:27017/gisdb');
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+module.exports = app;
 
-});
-
-// POST method route
-app.post('/register', function (req, res) {
-    User.register(new User({ username: req.body.username }), req.body.password, function(err, account) {
-        if (err) {
-            return res.status(500).json({err: err});
-        }
-        passport.authenticate('local')(req, res, function () {
-            return res.status(200).json({status: 'Registration successful!'});
-        });
-    });
-});
-
-//============MONGO==============
-
-//Define models
-var Point = require('./models/point.js');
-var Polygon = require('./models/polygon.js');
-var LineString = require('./models/linestring.js');
 
 function sendData(){
     console.log('Sent data');
@@ -151,5 +159,3 @@ function makeBuffer(feature, distance){
     var buffered = jstsGeom.buffer(distance);
     io.emit('done buffering', JSON.stringify(writer.write(buffered)));
 }
-
-module.exports = app;

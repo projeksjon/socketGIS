@@ -65,6 +65,9 @@
         <div class="so-side-nav-small-slider-container">
             <h1>Hello world</h1>
             <select ng-model="interactionType" ng-change="addInteraction()" ng-options="interactionType for interactionType in interactionTypes"></select>
+            <div ng-controller="logoutController">
+                <a ng-click='logout()' class="btn btn-default">Logout</a>
+            </div>
         </div>
     </div>
 </nav>

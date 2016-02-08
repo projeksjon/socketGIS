@@ -1,7 +1,6 @@
 /**
- * Created by rubenschmidt on 01.02.2016.
-*/
-
+ * Created by rubenschmidt on 08.02.2016.
+ */
 var geoJSONFormat = new ol.format.GeoJSON();
 
 socketGis.controller("mapController", function ($scope, $http) {
@@ -101,7 +100,7 @@ socketGis.controller("mapController", function ($scope, $http) {
     });
 
     // a DragBox interaction used to select features by drawing boxes while holding, cmd og ctrl
-     $scope.dragBox = new ol.interaction.DragBox({
+    $scope.dragBox = new ol.interaction.DragBox({
         condition: ol.events.condition.platformModifierKeyOnly
     });
 
@@ -236,7 +235,7 @@ function init($scope) {
         view: view
     });
 
-     $scope.geolocation = new ol.Geolocation({
+    $scope.geolocation = new ol.Geolocation({
         // take the projection to use from the map's view
         projection: view.getProjection()
     });

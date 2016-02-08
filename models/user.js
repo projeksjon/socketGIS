@@ -2,9 +2,9 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 // user model
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    passportLocalMongoose = require('passport-local-mongoose');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var passportLocalMongoose = require('passport-local-mongoose');
 
 
 var User = new Schema({

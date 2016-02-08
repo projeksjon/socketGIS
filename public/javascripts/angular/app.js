@@ -6,10 +6,31 @@ socketGis.config(function($routeProvider) {
         .when('/file/', {
             controller: 'fileController',
             templateUrl: '/partials/file.html',
+            access: {restricted: true}
         })
         .when('/', {
             controller: 'mapController',
             templateUrl: '/partials/map.html',
+            access: {restricted: true}
         })
-        .otherwise({ redirectTo: '/' });
+        .when('/login',{
+            controller: 'loginController',
+            templateUrl: '/partials/login.html',
+            access: {restricted: false}
+        })
+        .when('/register', {
+            templateUrl: 'partials/register.html',
+            controller: 'registerController',
+            access: {restricted: false}
+        })
+        .otherwise({ redirectTo: '/login' });
+});
+
+socketGis.run(function ($rootScope, $location, $route, AuthService) {
+    $rootScope.$on('$routeChangeStart', function (event, next, current) {
+        if (next.access.restricted && AuthService.isLoggedIn() === false) {
+            $location.path('/login');
+            $route.reload();
+        }
+    });
 });
