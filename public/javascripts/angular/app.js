@@ -1,4 +1,4 @@
-var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies']);
+var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies', 'btford.socket-io']);
 
 
 socketGis.config(function($routeProvider) {

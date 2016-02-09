@@ -43,8 +43,9 @@ router.post('/userInfo', function(req,res){
     //Get the token from the request
     var token = getToken(req.headers);
     if(token){
+        //Decode token to retreive the user object
         var decoded = jwt.decode(token, 'hemmelig');
-        console.log(decoded);
+        //Search for the user in the db.
         User.findOne({
             username: decoded.username
         }, function(err, user) {
@@ -53,6 +54,7 @@ router.post('/userInfo', function(req,res){
             if (!user) {
                 return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
             } else {
+                //We found a user, and thus the user is authenticated with the current token.
                 res.status(200).json({success: true, msg: 'Welcome in the member area ' + user.name + '!'});
             }
         });
@@ -62,6 +64,7 @@ router.post('/userInfo', function(req,res){
 
 });
 
+//Strip the authorization header and get the token
 getToken = function (headers) {
     if (headers && headers.authorization) {
         var parted = headers.authorization.split(' ');

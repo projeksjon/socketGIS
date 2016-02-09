@@ -1,6 +1,13 @@
 /**
  * Created by rubenschmidt on 08.02.2016.
  */
+socketGis.factory('socket', function (socketFactory) {
+    var socket = socketFactory();
+    socket.forward('error');
+    return socket;
+});
+
+
 socketGis.factory('AuthService',
     ['$q', '$timeout', '$http','$cookies',
         function ($q, $timeout, $http, $cookies) {

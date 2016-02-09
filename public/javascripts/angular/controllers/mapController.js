@@ -1,10 +1,10 @@
 /**
  * Created by rubenschmidt on 08.02.2016.
  */
-var geoJSONFormat = new ol.format.GeoJSON();
 
-socketGis.controller("mapController", function ($scope, $http, $timeout) {
+socketGis.controller("mapController", function ($scope, $http, $timeout, socket) {
     $scope.map = init($scope);
+    var geoJSONFormat = new ol.format.GeoJSON();
 
     $scope.interactionTypes = ['None', 'Point', 'LineString', 'Polygon', 'Circle', 'Square', 'Box'];
     $scope.interactionType = 'None';
@@ -90,11 +90,24 @@ socketGis.controller("mapController", function ($scope, $http, $timeout) {
     };
 
 
+    $scope.addShape = function addShape(){
+        console.log("kom inn");
+        //for the shapefiles in the folder called 'files' with the name pandr.shp
+        shp("shapefiles/TM_WORLD_BORDERS_SIMPL-0.3.zip").then(function(geojson){
+            //do something with your geojson
+            var features= geoJSONFormat.readFeatures(geojson);
+            console.log(features);
+            $scope.vectorSource.addFeatures(features);
+
+        });
+    };
+
+
     // a normal select interaction to handle click on features
     var select = new ol.interaction.Select();
     $scope.map.addInteraction(select);
 
-//Get the selected features
+    //Get the selected features
     $scope.selectedFeatures = select.getFeatures();
 
     $scope.map.on('click', function() {
@@ -142,11 +155,11 @@ socketGis.controller("mapController", function ($scope, $http, $timeout) {
         $scope.positionFeature.setGeometry(coordinates ?
             new ol.geom.Point(coordinates) : null);
     });
-
     //WEBSOCKET ONS BELOW
     //On start of connection, the server sends the stored points. TODO change this.
-    socket.on('all points', function(points){
-        points.forEach(function(point){
+    socket.forward('all points', $scope);
+    $scope.$on('socket:all points', function (ev, data) {
+        data.forEach(function(point){
             //Create valid geojson
             var p =  turf.point(point.loc.coordinates);
             //read the geojson and make a feature of it
@@ -157,6 +170,8 @@ socketGis.controller("mapController", function ($scope, $http, $timeout) {
             $scope.vectorSource.addFeature(feature);
         })
     });
+
+
 
     socket.on('all lines', function(lines){
         lines.forEach(function(line){
