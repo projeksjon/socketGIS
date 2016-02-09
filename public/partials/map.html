@@ -58,13 +58,12 @@
     </div>
 </div>-->
 <nav class="so-side-nav so-side-nav-small">
-    <button ng-click="toggleSlider()"><i class = "glyphicon glyphicon-plus"></i></button>
-    <button ng-click="toggleSlider()"><i class = "glyphicon glyphicon-comment"></i></button>
-    <button ng-click="toggleSlider()"><i class = "glyphicon glyphicon-cog"></i></button>
+    <button ng-click="toggleSlider()"><i class = "fa fa-home"></i></button>
+    <button ng-click="toggleSlider()"><i class = "fa fa-comment"></i></button>
+    <button ng-click="toggleSlider()"><i class = "fa fa-cog"></i></button>
     <div class="so-side-nav-small-slider" ng-show="show.slider">
         <div class="so-side-nav-small-slider-header so-white so-center">H j e m</div>
         <div class="so-side-nav-small-slider-container">
-            <h1>Hello world</h1>
             <select ng-model="interactionType" ng-change="addInteraction()" ng-options="interactionType for interactionType in interactionTypes"></select>
             <div ng-controller="logoutController">
                 <a ng-click='logout()' class="btn btn-default">Logout</a>
@@ -72,6 +71,6 @@
         </div>
     </div>
 </nav>
-<div class="has-nav has-side-nav-small so-container">
+<div class="has-nav has-side-nav-small so-container" ng-class="{'has-extended-side-nav-small':show.slider}">
     <div id="map"></div>
 </div>
