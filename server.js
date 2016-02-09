@@ -2,15 +2,14 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
-var expressSession = require('express-session');
-var RedisStore = require('connect-redis')(expressSession);
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var cors = require("cors");
+var cors = require('cors');
 var io = require('./io');
-var jsts = require("jsts");
+var jsts = require('jsts');
 var passport = require('passport');
+var jwt = require('jwt-simple');
 
 //Mongoose
 mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
@@ -22,6 +21,16 @@ var LineString = require('./models/linestring.js');
 //Create instance of express
 var app = express();
 
+//Serve the static folder and the index file
+app.use(require('node-sass-middleware')({
+    src: path.join(__dirname, 'public'),
+    dest: path.join(__dirname, 'public'),
+    indentedSyntax: true,
+    sourceMap: true
+}));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
 // require routes
 var routes = require('./routes/api.js');
 
@@ -29,31 +38,11 @@ app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-var store = new RedisStore({
-    url: 'redis:pub-redis-11762.us-east-1-3.7.ec2.redislabs.com:11762'
-});
-app.use(expressSession({
-    store: store,
-    secret: 'keyboard cat',
-    resave: true,
-    saveUninitialized: true
-}));
+app.use(cookieParser('keyboard cat'));
 app.use(passport.initialize());
-app.use(passport.session());
-//Serve the static folder and the index file
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(require('node-sass-middleware')({
-    src: path.join(__dirname, 'public'),
-    dest: path.join(__dirname, 'public'),
-    indentedSyntax: true,
-    sourceMap: true
-}));
+
 // configure passport
 passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
 
 // routes
 app.use('/user/', routes);

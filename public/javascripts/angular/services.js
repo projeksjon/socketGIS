@@ -2,8 +2,8 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 socketGis.factory('AuthService',
-    ['$q', '$timeout', '$http',
-        function ($q, $timeout, $http) {
+    ['$q', '$timeout', '$http','$cookies',
+        function ($q, $timeout, $http, $cookies) {
 
             // create user variable
             var user = null;
@@ -23,7 +23,16 @@ socketGis.factory('AuthService',
             }
 
             function getUserStatus() {
-                return user;
+
+                if ($cookies.get('token')){
+                    $http.defaults.headers.common.Authorization = 'Token ' + $cookies.get('token');
+                }
+
+                var deferred = $q.defer();
+
+
+
+                return deferred.promise;
             }
 
             function login(username, password) {
@@ -36,9 +45,12 @@ socketGis.factory('AuthService',
 
                     .then(function (response) {
                         // handle success
-                        if(response.status === 200 && response.data.status){
+                        if(response.status === 200 && response.data.token){
                             user = true;
+                            $http.defaults.headers.common.Authorization = 'Token ' + response.data.token;
+                            $cookies.put('token', response.data.token);
                             deferred.resolve();
+
                         } else {
                             user = false;
                             deferred.reject();
@@ -63,6 +75,8 @@ socketGis.factory('AuthService',
                     .then(function (response) {
                         // handle success
                         user = false;
+                        delete $http.defaults.headers.common.Authorization;
+                        $cookies.remove('token');
                         deferred.resolve();
                     }, function(response){
                         // handle error

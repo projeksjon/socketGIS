@@ -1,4 +1,4 @@
-var socketGis = angular.module("socketGis", ['ngRoute']);
+var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies']);
 
 
 socketGis.config(function($routeProvider) {
