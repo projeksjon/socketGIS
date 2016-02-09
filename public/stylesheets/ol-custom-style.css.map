@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "ol-custom-style.css",
+	"sources": [
+		"ol-custom-style.sass"
+	],
+	"mappings": "AAAA,WAAW,CAAC;EACV,UAAU,EAAE,IAAK,GAQQ;EAT3B,WAAW,CAGT,MAAM,CAAC;IACL,MAAM,EAAE,IAAK;IACb,KAAK,EAAE,IAAK;IACZ,UAAU,EAAE,IAAK,GAGI;IATzB,WAAW,CAGT,MAAM,AAKH,MAAM,CAAC;MACN,OAAO,EAAE,IAAK,GAAG",
+	"names": []
+}

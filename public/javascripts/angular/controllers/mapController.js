@@ -3,7 +3,7 @@
  */
 var geoJSONFormat = new ol.format.GeoJSON();
 
-socketGis.controller("mapController", function ($scope, $http) {
+socketGis.controller("mapController", function ($scope, $http, $timeout) {
     $scope.map = init($scope);
 
     $scope.interactionTypes = ['None', 'Point', 'LineString', 'Polygon', 'Circle', 'Square', 'Box'];
@@ -16,6 +16,9 @@ socketGis.controller("mapController", function ($scope, $http) {
     // Functions
     $scope.toggleSlider = function() {
         $scope.show.slider = (!$scope.show.slider);
+        $timeout(function() {
+            $scope.map.updateSize();
+        }, 300);
     };
 
     $scope.addInteraction = function addInteraction() {
