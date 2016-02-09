@@ -91,14 +91,12 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
 
 
     $scope.addShape = function addShape() {
-        console.log("kom inn");
         //for the shapefiles in the folder called 'files' with the name pandr.shp
-        shp("shapefiles/TM_WORLD_BORDERS_SIMPL-0.3.zip").then(function (geojson) {
+        shp("shapefiles/arealbruk.zip").then(function (geojson) {
             //do something with your geojson
-            var features = geoJSONFormat.readFeatures(geojson);
-            console.log(features);
+            console.log(JSON.stringify(geojson));
+            var features = geoJSONFormat.readFeatures(geojson,{dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
             $scope.vectorSource.addFeatures(features);
-
         });
     };
 
