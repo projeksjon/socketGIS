@@ -25,3 +25,18 @@ socketGis.directive('map', function() {
         }
     }
 });
+
+socketGis.directive('firefly', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+
+            $.firefly({
+                color: '#fff',
+                minPixel: 1,
+                maxPixel: 3,
+                total : 65,
+                on: '#testId'});
+        }
+    }
+});
