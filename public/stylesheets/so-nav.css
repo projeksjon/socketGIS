@@ -3,7 +3,7 @@
   top: 0;
   width: 100%;
   height: 100px;
-  background: #d00000; }
+  background: #545ab6; }
   .so-nav .brand {
     float: left;
     height: 100%;
@@ -47,10 +47,10 @@
       margin: 0 auto;
       width: 30%; }
   .so-side-nav .active {
-    background: linear-gradient(to bottom, #d00000 0%, #9d0000 100%);
+    background: linear-gradient(to bottom, #545ab6 0%, #404697 100%);
     color: #fff; }
     .so-side-nav .active:hover {
-      background: linear-gradient(to bottom, #ea0000 0%, #b70000 100%); }
+      background: linear-gradient(to bottom, #666bbe 0%, #484ea9 100%); }
 
 .so-side-nav-small {
   width: 60px;
@@ -72,23 +72,23 @@
   .so-side-nav-small .so-side-nav-small-slider {
     position: fixed;
     top: 100px;
-    left: 60px;
+    left: -300px;
     bottom: 0;
-    width: 0;
+    width: 300px;
     background: #333;
     overflow: hidden;
-    -webkit-transition: width 500ms ease;
-      -webkit-transition--moz-transition: width 500ms ease;
-      -webkit-transition--ms-transition: width 500ms ease;
-      -webkit-transition--o-transition: width 500ms ease;
-      -webkit-transition-transition: width 500ms ease; }
+    -webkit-transition: all 500ms ease;
+      -webkit-transition--moz-transition: all 500ms ease;
+      -webkit-transition--ms-transition: all 500ms ease;
+      -webkit-transition--o-transition: all 500ms ease;
+      -webkit-transition-transition: all 500ms ease; }
     .so-side-nav-small .so-side-nav-small-slider .so-side-nav-small-slider-container {
       padding: 20px;
       width: 300px; }
       .so-side-nav-small .so-side-nav-small-slider .so-side-nav-small-slider-container select {
         width: 100%; }
   .so-side-nav-small .slider-active {
-    width: 300px; }
+    left: 60px; }
 
 .has-nav {
   padding-top: 100px; }

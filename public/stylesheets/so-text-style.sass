@@ -7,3 +7,38 @@
 //Text transform
 .so-upper
   text-transform: uppercase
+
+// Colors
+.so-white
+  color: #fff
+
+
+// Other
+
+.so-text-background
+  position: relative
+  z-index: 1
+  text-align: center
+  margin-bottom: 20px
+
+  &:before
+    border-top: 2px solid #dfdfdf
+    content: ""
+    margin: 0 auto /* this centers the line to the full width specified */
+    position: absolute /* positioning must be absolute here, and relative positioning must be applied to the parent */
+    top: 50%
+    left: 0
+    right: 0
+    bottom: 0
+    width: 95%
+    z-index: -1
+
+
+  span
+    /* to hide the lines from behind the text, you have to set the background color the same as the container */
+    color: #fff
+    font-weight: 100
+    background: rgb(79, 63, 134)
+    padding: 0 15px
+
+

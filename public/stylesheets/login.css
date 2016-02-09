@@ -1,0 +1,50 @@
+.login-container {
+  background-color: #3B2F63;
+  background-image: radial-gradient(at 0 bottom, rgba(118, 72, 160, 0.7) 0%, rgba(118, 72, 160, 0) 60%), radial-gradient(at 90% bottom, #523f8c 0%, rgba(82, 63, 140, 0) 40%), radial-gradient(at 50% top, rgba(84, 90, 182, 0.6) 0%, rgba(84, 90, 182, 0) 75%), radial-gradient(at right top, #794aa2 0%, rgba(121, 74, 162, 0) 57%);
+  background-size: auto,auto,100% 1000px,100% 1000px;
+  background-repeat: no-repeat; }
+  .login-container .so-login-logo {
+    position: fixed;
+    bottom: 30px;
+    right: 50px;
+    height: 120px; }
+    .login-container .so-login-logo img {
+      height: 100%; }
+  .login-container .login-box {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    margin-top: -250px;
+    height: 450px;
+    width: 400px;
+    padding: 30px; }
+    .login-container .login-box .login-field {
+      position: relative;
+      width: 100%; }
+      .login-container .login-box .login-field span {
+        position: absolute;
+        right: 15px;
+        color: #888;
+        font-size: 22px;
+        line-height: 50px; }
+      .login-container .login-box .login-field input {
+        width: 100%;
+        height: 50px;
+        margin-bottom: 20px;
+        border: 0;
+        background: #fff;
+        padding-left: 10px;
+        font-size: 18px;
+        font-weight: 300; }
+      .login-container .login-box .login-field button {
+        width: 100%;
+        height: 50px;
+        border: 0;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 20px;
+        background: rgba(118, 72, 160, 0.7); }
+
+/*# sourceMappingURL=login.css.map */

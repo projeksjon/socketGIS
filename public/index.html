@@ -3,6 +3,7 @@
 <head>
     <title>SocketGis</title>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
     <link rel='stylesheet' href='/stylesheets/so-nav.css'/>
     <link rel='stylesheet' href='/stylesheets/so-files.css'/>
     <link rel='stylesheet' href='/stylesheets/so-text-style.css'/>
@@ -18,7 +19,7 @@
 </head>
 <body ng-app="socketGis">
 
-<div class="so-nav">
+<div class="so-nav" ng-controller="navController" ng-show="showNav">
     <nav class="so-nav">
         <div class="brand"><img src="/images/socketGISLong.png" alt=""></div>
     </nav>
@@ -41,6 +42,7 @@
 <script src="javascripts/angular/controllers/loginController.js"></script>
 <script src="javascripts/angular/controllers/registerController.js"></script>
 <script src="javascripts/angular/controllers/logoutController.js"></script>
+<script src="javascripts/angular/controllers/navController.js"></script>
 <script src="javascripts/angular/directives.js"></script>
 <script src="javascripts/angular/services.js"></script>
 <!--<script src="/javascripts/map.js"></script>

@@ -1,10 +1,29 @@
-<nav class="so-side-nav so-side-nav-small">
-    <button><i class = "glyphicon glyphicon-plus"></i></button>
-    <button><i class = "glyphicon glyphicon-comment"></i></button>
-    <button><i class = "glyphicon glyphicon-cog"></i></button>
-</nav>
-<div class="has-nav has-side-nav-small so-container">
-    <div class="col-sm-4 col-sm-offset-4 text-center">
+<div class="so-container login-container">
+    <div class="so-login-logo">
+        <img src="/images/socketGIS.png" alt="">
+    </div>
+    <div class="login-box">
+        <h1 class="so-thin so-upper so-white">Logg inn</h1>
+        <form ng-submit="login()">
+            <div class="login-field">
+                <span class="fa fa-user"></span>
+                <input type="text" class="form-control" name="username" placeholder="Brukernavn" ng-model="loginForm.username" required>
+            </div>
+            <div class="login-field">
+                <span class="fa fa-lock"></span>
+                <input type="password" class="form-control" name="password" placeholder="Passord" ng-model="loginForm.password" required>
+            </div>
+            <div class="login-field">
+                <button type="submit" ng-disabled="disabled">Logg inn</button>
+            </div>
+            <h2 class="so-text-background"><span>eller</span></h2>
+            <div class="login-field">
+                <a ng-href="#/register"><button>Registrer deg her</button></a>
+            </div>
+        </form>
+    </div>
+
+    <!--<div class="col-sm-4 col-sm-offset-4 text-center">
         <h1>
             Logg inn
         </h1>
@@ -23,5 +42,5 @@
             </div>
             <small><a ng-href="#/register">Registrer deg her</a></small>
         </form>
-    </div>
+    </div>-->
 </div>
