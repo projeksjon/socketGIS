@@ -24,7 +24,7 @@ $so-container-padding-left-small: $so-side-nav-small-width
   width: 100%
   height: $so-nav-height
 
-  background: $so-main-color
+  background: linear-gradient(to bottom right, rgb(248, 178, 125), rgb(203, 37, 63))
 
   .brand
     float: left
@@ -36,9 +36,6 @@ $so-container-padding-left-small: $so-side-nav-small-width
 
     img
       height: 100%
-
-
-
 
 .so-side-nav
   position: fixed
@@ -125,13 +122,13 @@ $so-container-padding-left-small: $so-side-nav-small-width
   .so-side-nav-small-slider
     position: fixed
     top: $so-nav-height
-    left: $so-side-nav-small-width
+    left: $so-side-nav-small-width - 300px
     bottom: 0
-    width: 0
+    width: 300px
     background: #333
     overflow: hidden
 
-    @include trans(width, 500ms)
+    @include trans(all, 500ms)
 
     .so-side-nav-small-slider-container
       padding: 20px
@@ -142,7 +139,7 @@ $so-container-padding-left-small: $so-side-nav-small-width
 
 
   .slider-active
-    width: 300px
+    left: $so-side-nav-small-width
 
 .has-nav
   padding-top: $so-container-padding-top
