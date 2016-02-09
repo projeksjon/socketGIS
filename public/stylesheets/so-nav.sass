@@ -8,7 +8,7 @@
 $so-container-padding-top: 100px
 $so-container-padding-left: 300px
 
-$so-main-color: rgba(84, 90, 182, 1)
+$so-main-color: rgba(85, 62, 106, 1)
 
 // Nav
 $so-nav-height: 100px
@@ -46,7 +46,7 @@ $so-container-padding-left-small: $so-side-nav-small-width
 
   padding-top: 30px
 
-  background: #333
+  background: #222
   color: #93959E
 
   z-index: 1
@@ -70,7 +70,7 @@ $so-container-padding-left-small: $so-side-nav-small-width
       color: #93959E
 
       &:hover
-        background: #444
+        background: #2a2a2a
 
       i
         padding-right: 10px
@@ -117,12 +117,12 @@ $so-container-padding-left-small: $so-side-nav-small-width
 
     &:focus
       outline: none
-      background: #555
+      background: #333
 
   .so-side-nav-small-slider
     position: fixed
     top: $so-nav-height
-    left: -300px
+    left: $so-side-nav-small-width
     bottom: 0
     width: 300px
     background: #333
@@ -130,16 +130,20 @@ $so-container-padding-left-small: $so-side-nav-small-width
 
     @include trans(all, 500ms)
 
+    .so-side-nav-small-slider-header
+      width: 100%
+      height: 40px
+      background: rgba(118,72,160,0.2)
+
+      line-height: 40px
+      font-size: 18px
+
     .so-side-nav-small-slider-container
       padding: 20px
       width: 300px
 
       select
         width: 100%
-
-
-  .slider-active
-    left: $so-side-nav-small-width
 
 
 .has-nav

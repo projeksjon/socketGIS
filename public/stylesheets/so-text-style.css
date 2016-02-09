@@ -1,8 +1,14 @@
 .so-thin {
   font-weight: 300; }
 
+.so-very-thin {
+  font-weight: 100; }
+
 .so-upper {
   text-transform: uppercase; }
+
+.so-center {
+  text-align: center; }
 
 .so-white {
   color: #fff; }
@@ -27,7 +33,7 @@
     /* to hide the lines from behind the text, you have to set the background color the same as the container */
     color: #fff;
     font-weight: 100;
-    background: #4f3f86;
+    background: #504288;
     padding: 0 15px; }
 
 /*# sourceMappingURL=so-text-style.css.map */
