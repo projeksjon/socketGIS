@@ -44,6 +44,18 @@ router.post('/userInfo', function(req,res){
     var token = getToken(req.headers);
     if(token){
         var decoded = jwt.decode(token, 'hemmelig');
+        console.log(decoded);
+        User.findOne({
+            username: decoded.username
+        }, function(err, user) {
+            if (err) throw err;
+
+            if (!user) {
+                return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
+            } else {
+                res.status(200).json({success: true, msg: 'Welcome in the member area ' + user.name + '!'});
+            }
+        });
     }else{
         return res.status(403).send({success: false, msg: 'No token provided.'});
     }

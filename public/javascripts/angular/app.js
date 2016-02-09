@@ -27,6 +27,11 @@ socketGis.config(function($routeProvider) {
 });
 
 socketGis.run(function ($rootScope, $location, $route, AuthService) {
+    AuthService.getAuthStatus().then(function(){
+        //Handle success, user is authenticated
+        $location.path('/');
+        $route.reload();
+    });
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
         if (next.access.restricted && AuthService.isLoggedIn() === false) {
             $location.path('/login');

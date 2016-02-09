@@ -14,7 +14,8 @@ socketGis.factory('AuthService',
                 getUserStatus: getUserStatus,
                 login: login,
                 logout: logout,
-                register: register
+                register: register,
+                getAuthStatus: getAuthStatus
             });
 
             function isLoggedIn() {
@@ -23,15 +24,26 @@ socketGis.factory('AuthService',
             }
 
             function getUserStatus() {
+                return user;
+            }
+
+            function getAuthStatus(){
+                var deferred = $q.defer();
 
                 if ($cookies.get('token')){
                     $http.defaults.headers.common.Authorization = 'Token ' + $cookies.get('token');
+                }else {
+                    deferred.reject();
                 }
-
-                var deferred = $q.defer();
-
-
-
+                $http.post('/user/userInfo').then(function(response){
+                    //Handle success
+                    //Usertoken went through and the user is authenticated
+                    user = true;
+                    deferred.resolve();
+                }, function(response){
+                    //Handle error
+                    deferred.reject();
+                });
                 return deferred.promise;
             }
 
