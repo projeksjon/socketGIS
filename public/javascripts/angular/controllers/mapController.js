@@ -24,13 +24,15 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
 
     $scope.toggle = function(type) {
         $scope.show[type] = $scope.show[type] ? false : true;
-    }
-
+    };
+    $scope.draw;
     $scope.addInteraction = function addInteraction(type) {
+        console.log(type);
         $scope.interactionType = type;
         $scope.show.interactionTypes = false;
 
         var value = $scope.interactionType;
+
         if (value !== 'None') {
             var geometryFunction, maxPoints;
             if (value === 'Square') {
@@ -51,18 +53,26 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
                     return geometry;
                 };
             }
-            draw = new ol.interaction.Draw({
+            //If already a draw is defined remove it first.
+            if($scope.draw){
+                $scope.map.removeInteraction($scope.draw);
+            }
+
+            $scope.draw = new ol.interaction.Draw({
                 source: $scope.drawSource,
                 type: /** @type {ol.geom.GeometryType} */ (value),
                 geometryFunction: geometryFunction,
                 maxPoints: maxPoints
             });
-            $scope.map.addInteraction(draw);
+            $scope.map.addInteraction($scope.draw);
             //When finished drawing
-            draw.on('drawend', saveDrawing);
+            $scope.draw.on('drawend', saveDrawing);
         } else {
             //None is selected, we remove the current selected drawing type
-            $scope.map.removeInteraction(draw);
+            if($scope.draw){
+                $scope.map.removeInteraction($scope.draw);
+            }
+
         }
     };
 
