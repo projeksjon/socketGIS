@@ -10,7 +10,8 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
     $scope.interactionType = 'None';
 
     $scope.show = {
-        slider: false
+        slider: false,
+        interactionTypes: false
     };
 
     // Functions
@@ -21,7 +22,12 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
         }, 300);
     };
 
-    $scope.addInteraction = function addInteraction() {
+    $scope.toggle = function(type) {
+        $scope.show[type] = $scope.show[type] ? false : true;
+    }
+
+    $scope.addInteraction = function addInteraction(type) {
+        $scope.interactionType = type;
         var value = $scope.interactionType;
         if (value !== 'None') {
             var geometryFunction, maxPoints;

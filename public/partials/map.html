@@ -61,10 +61,20 @@
     <button ng-click="toggleSlider()"><i class = "fa fa-home"></i></button>
     <button ng-click="toggleSlider()"><i class = "fa fa-comment"></i></button>
     <button ng-click="toggleSlider()"><i class = "fa fa-cog"></i></button>
-    <div class="so-side-nav-small-slider" ng-show="show.slider">
+    <div class="so-side-nav-small-slider slide-right" ng-show="show.slider">
         <div class="so-side-nav-small-slider-header so-white so-center">H j e m</div>
         <div class="so-side-nav-small-slider-container">
-            <select ng-model="interactionType" ng-change="addInteraction()" ng-options="interactionType for interactionType in interactionTypes"></select>
+            <div class="container-field" ng-click="toggle('interactionTypes')">
+                {{interactionType}}
+                <div class="container-field-icon">
+                    <span class="fa fa-chevron-right" ng-show="!show.interactionTypes"></span>
+                    <span class="fa fa-chevron-down" ng-show="show.interactionTypes"></span>
+                </div>
+            </div>
+            <div class="container-sub-fields" ng-class="{'container-sub-fields-active': show.interactionTypes}">
+                <div class="container-sub-field" ng-click="addInteraction(type)" ng-repeat="type in interactionTypes">{{type}}</div>
+            </div>
+            <div class="container-field"></div>
             <div ng-controller="logoutController">
                 <a ng-click='logout()' class="btn btn-default">Logout</a>
             </div>

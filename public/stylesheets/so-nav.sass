@@ -139,8 +139,58 @@ $so-container-padding-left-small: $so-side-nav-small-width
       font-size: 18px
 
     .so-side-nav-small-slider-container
-      padding: 20px
       width: 300px
+
+      .container-field
+        position: relative
+        width: 100%
+        height: 40px
+        padding: 0 15px
+
+        cursor: pointer
+        transition: 0.15s
+
+        //Text
+        line-height: 40px
+        color: #eee
+        font-size: 16px
+
+        border-bottom: 1px solid #555
+
+        &:hover
+          background: #3a3a3a
+
+        .container-field-icon
+          position: absolute
+          top: 0
+          right: 15px
+
+      .container-sub-fields
+        width: 100%
+        background: #222
+
+        max-height: 0
+
+        overflow: hidden
+
+        .container-sub-field
+          width: 100%
+          height: 30px
+          padding: 0 10px
+
+          cursor: pointer
+
+          line-height: 30px
+          color: #eee
+
+          &:hover
+            background: #2a2a2a
+
+        @include trans(all, 500ms)
+
+      .container-sub-fields-active
+        max-height: 400px
+
 
       select
         width: 100%
