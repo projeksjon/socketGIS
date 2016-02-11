@@ -29,7 +29,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
     $scope.addInteraction = function addInteraction(type) {
         $scope.interactionType = type;
         $scope.show.interactionTypes = false;
-        
+
         var value = $scope.interactionType;
         if (value !== 'None') {
             var geometryFunction, maxPoints;
