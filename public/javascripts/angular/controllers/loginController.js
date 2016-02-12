@@ -5,8 +5,6 @@ socketGis.controller('loginController',
     ['$scope', '$location', 'AuthService',
         function ($scope, $location, AuthService) {
 
-            console.log(AuthService.getUserStatus());
-
             $scope.login = function () {
 
                 // initial values

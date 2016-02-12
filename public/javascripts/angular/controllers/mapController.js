@@ -2,7 +2,7 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 
-socketGis.controller("mapController", function ($scope, $http, $timeout, socket) {
+socketGis.controller("mapController", function ($scope, $http, $timeout, socket, FileService) {
     $scope.map = init();
     var geoJSONFormat = new ol.format.GeoJSON();
 
@@ -209,18 +209,21 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
     //File upload functions, used with ng-file-upload
     $scope.$watch('file', function () {
         if ($scope.file != null) {
-            console.log($scope.file);
-            shp($scope.file).then(function (geojson) {
-                console.log("kom inn");
-                var features = geoJSONFormat.readFeatures(geojson,{dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+            FileService.handleFile($scope.file).then(function(data){
+                //Success
+                var crs = 'EPSG:4326';
+                if(data.crs){
+                    crs = data.crs.properties.name;
+                    console.log(crs);
+                }
+                var features = geoJSONFormat.readFeatures(data,{dataProjection: crs, featureProjection: 'EPSG:3857'});
                 $scope.vectorSource.addFeatures(features);
+                //Zoom to newly added
+                //var extent = $scope.vectorSource.getExtent();
+                //$scope.map.getView().fit(extent, $scope.map.getSize());
             });
         }
     });
-
-    $scope.upload = function (file) {
-        console.log(file);
-    };
 
     //WEBSOCKET ONS BELOW
     //On start of connection, the server sends the stored points. TODO change this.

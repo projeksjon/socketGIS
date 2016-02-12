@@ -7,6 +7,49 @@ socketGis.factory('socket', function (socketFactory) {
     return socket;
 });
 
+socketGis.factory('FileService',['$q', function($q){
+    var reader = new FileReader();
+    var geoJSONFormat = new ol.format.GeoJSON();
+
+    return ({
+        handleFile: handleFile
+    });
+
+    function handleFile(file){
+        var name = file.name;
+        if(name.endsWith('.zip')){
+            return handleZip(file);
+        }else if (name.endsWith('.sos')){
+            return handleSosi(file);
+        }
+    }
+
+    function handleSosi(file){
+        var deferred = $q.defer();
+        //create a parser
+        var parser = new SOSI.Parser();
+        reader.onload = function(e){
+            //parse SOSI-data (must be a newline-separated string!)
+            var sosidata = parser.parse(e.target.result);
+            //get as GeoJSON
+            deferred.resolve(sosidata.dumps("geojson"));
+        };
+        reader.readAsText(file);
+        return deferred.promise;
+    }
+
+    function handleZip(file){
+        var deferred = $q.defer();
+        reader.onload = function(e){
+            //When the reader is done reading, send the result to the shp.js library.
+            shp(e.target.result).then(function (geojson) {
+                deferred.resolve(geojson);
+            });
+        };
+        reader.readAsArrayBuffer(file);
+        return deferred.promise;
+    }
+}]);
 
 socketGis.factory('AuthService',
     ['$q', '$timeout', '$http','$cookies',
