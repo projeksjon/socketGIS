@@ -25,11 +25,11 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
     $scope.toggle = function(type) {
         $scope.show[type] = $scope.show[type] ? false : true;
     };
-    $scope.draw;
+
     $scope.addInteraction = function addInteraction(type) {
-        console.log(type);
         $scope.interactionType = type;
         $scope.show.interactionTypes = false;
+        $scope.draw;
 
         var value = $scope.interactionType;
 
@@ -206,6 +206,21 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket)
         $scope.selectedFeatures.clear();
     };
 
+    //File upload functions, used with ng-file-upload
+    $scope.$watch('file', function () {
+        if ($scope.file != null) {
+            console.log($scope.file);
+            shp($scope.file).then(function (geojson) {
+                console.log("kom inn");
+                var features = geoJSONFormat.readFeatures(geojson,{dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+                $scope.vectorSource.addFeatures(features);
+            });
+        }
+    });
+
+    $scope.upload = function (file) {
+        console.log(file);
+    };
 
     //WEBSOCKET ONS BELOW
     //On start of connection, the server sends the stored points. TODO change this.
