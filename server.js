@@ -14,6 +14,7 @@ var jwt = require('jwt-simple');
 //Mongoose
 mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
 var User = require('./models/user.js');
+var Layer = require('./models/layer.js');
 var Point = require('./models/point.js');
 var Polygon = require('./models/polygon.js');
 var LineString = require('./models/linestring.js');
@@ -79,6 +80,10 @@ function sendData(){
     Polygon.find({}, function(err, polys){
         io.emit('all polys', polys);
     });
+
+    Layer.find({}, function(err, layers){
+       io.emit('all layers', layers)
+    });
 }
 
 //Socket connection found
@@ -137,6 +142,13 @@ io.on('connection', function(socket){
 
     socket.on('chat message', function(msg){
         io.emit('chat message', msg);
+    });
+
+    socket.on('add layer', function(layerName){
+        Layer.create({name: layerName}, function(err, layer){
+            console.log("added layer");
+            io.emit('added layer', layer)
+        })
     })
 
 });

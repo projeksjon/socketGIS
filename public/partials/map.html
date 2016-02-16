@@ -76,8 +76,15 @@
                 <div class="container-sub-field" ng-click="addInteraction(type)" ng-repeat="type in interactionTypes">{{type}}</div>
             </div>
             <div class="container-field" ng-click="deleteSelected()">Slett valgte objekter</div>
-            <div class="container-header so-very-thin so-upper">Shape filer</div>
-            <div class="container-field" ng-click="addShape()">Legg til shape</div>
+            <div class="container-header so-very-thin so-upper">Lag</div>
+            <div class="container-field" ng-click="toggle('addLayer')" ng-hide="show.addLayer">Legg til lag</div>
+            <div class="container-input" ng-show="show.addLayer">
+                <input class="form-control" type="text" ng-model="newLayerName" placeholder="Navn">
+                <button class="btn-default" ng-click="addLayer()">Legg til</button>
+            </div>
+            <div class="container-field" ng-repeat="lay in activeLayers">
+                {{ lay.name }}
+            </div>
             <div class="container-header so-very-thin so-upper">Annet</div>
             <div ng-controller="logoutController"><div class="container-field" ng-click='logout()'>Logg ut</div></div>
         </div>

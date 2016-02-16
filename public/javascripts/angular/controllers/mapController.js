@@ -4,6 +4,14 @@
 
 socketGis.controller("mapController", function ($scope, $http, $timeout, socket, FileService) {
     $scope.map = init();
+    $scope.activeLayers = [];
+    $scope.newLayerName ='';
+    //Add the layers here so it registers the event listeners
+    $scope.map.addLayer(new ol.layer.Tile({
+        source: new ol.source.OSM()
+    }));
+    $scope.map.addLayer($scope.vector);
+    $scope.map.addLayer($scope.saved);
     var geoJSONFormat = new ol.format.GeoJSON();
 
     $scope.interactionTypes = ['None', 'Point', 'LineString', 'Polygon', 'Circle', 'Square', 'Box'];
@@ -11,7 +19,8 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
 
     $scope.show = {
         slider: false,
-        interactionTypes: false
+        interactionTypes: false,
+        addLayer: false
     };
 
     // Functions
@@ -107,18 +116,6 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         });
     };
 
-
-    $scope.addShape = function addShape() {
-        //for the shapefiles in the folder called 'files' with the name pandr.shp
-        shp("shapefiles/arealbruk.zip").then(function (geojson) {
-            //do something with your geojson
-            console.log(JSON.stringify(geojson));
-            var features = geoJSONFormat.readFeatures(geojson,{dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-            $scope.vectorSource.addFeatures(features);
-        });
-    };
-
-
     // a normal select interaction to handle click on features
     var select = new ol.interaction.Select();
     $scope.map.addInteraction(select);
@@ -127,7 +124,6 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     $scope.selectedFeatures = select.getFeatures();
 
     $scope.map.on('click', function () {
-        console.log("click");
         $scope.selectedFeatures.clear();
     });
 
@@ -200,10 +196,21 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
                 if ($scope.drawSource.getFeatureById(id)) {
                     $scope.drawSource.removeFeature(feature);
                 }
+            }else{
+                //Not from database
+                $scope.fileSource.removeFeature(feature);
             }
         });
         //Clear the list of selected features
         $scope.selectedFeatures.clear();
+    };
+
+
+    $scope.addLayer = function(){
+        socket.emit('add layer', $scope.newLayerName);
+        //Reset name
+        $scope.newLayerName = '';
+        $scope.toggle('addLayer');
     };
 
     //File upload functions, used with ng-file-upload
@@ -214,13 +221,35 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
                 var crs = 'EPSG:4326';
                 if(data.crs){
                     crs = data.crs.properties.name;
-                    console.log(crs);
                 }
-                var features = geoJSONFormat.readFeatures(data,{dataProjection: crs, featureProjection: 'EPSG:3857'});
-                $scope.vectorSource.addFeatures(features);
-                //Zoom to newly added
-                //var extent = $scope.vectorSource.getExtent();
-                //$scope.map.getView().fit(extent, $scope.map.getSize());
+                var layers = [];
+                if (data.length > 1){
+                    //Multiple layers in dataset
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        layers.push(obj);
+                    }
+                }else {
+                    //Single layer in dataset
+                    layers.push(data);
+                }
+                layers.forEach(function(feat){
+                    var lay = new ol.layer.Vector({
+                        source: $scope.fileSource
+                    });
+                    $scope.map.addLayer(lay);
+
+                    var features = geoJSONFormat.readFeatures(feat,{dataProjection: crs, featureProjection: 'EPSG:3857'});
+                    features.forEach(function(f){
+                        var style = new ol.style.Style({
+                            fill: new ol.style.Fill({
+                                color: getRandomRgba(0.5)
+                            })
+                        });
+                        f.setStyle(style)
+                    });
+                    $scope.fileSource.addFeatures(features);
+                })
             });
         }
     });
@@ -241,6 +270,12 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         })
     });
 
+    socket.forward('all layers', $scope);
+    $scope.$on('socket:all layers', function(ev, data){
+        data.forEach(function(layer){
+            $scope.activeLayers.push(layer);
+        });
+    });
 
     socket.forward('all points', $scope);
     $scope.$on('socket:all lines', function (ev, data) {
@@ -284,18 +319,23 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         });
         socket.emit('add poly', geoObject);
     });
+    socket.forward('added layer', $scope);
+    $scope.$on('socket:added layer', function(ev, data){
+        $scope.activeLayers.push(data);
+    });
 
     function init() {
         $scope.drawSource = new ol.source.Vector({wrapX: false});
         $scope.vectorSource = new ol.source.Vector({wrapX: false});
+        $scope.fileSource = new ol.source.Vector({wrapX: false});
 
         //Layer for dbFeatures
-        var saved = new ol.layer.Vector({
+        $scope.saved = new ol.layer.Vector({
             source: $scope.vectorSource
         });
 
         //Layer for drawing
-        var vector = new ol.layer.Vector({
+        $scope.vector = new ol.layer.Vector({
             source: $scope.drawSource,
             style: new ol.style.Style({
                 fill: new ol.style.Fill({
@@ -321,11 +361,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
 
         var map = new ol.Map({
             target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
-                }),
-                vector, saved],
+            layers: [],
             view: view
         });
 
@@ -363,4 +399,13 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
                 console.log('Not defined feature');
         }
     }
+
+    //Generate a random rgb color string with given opacity.
+    function getRandomRgba(opacity){
+        var red = Math.floor(Math.random() * 255);
+        var green = Math.floor(Math.random() * 255);
+        var blue = Math.floor(Math.random() * 255);
+        return "rgba("+red + "," + green + "," +blue + "," + opacity + ")"
+    }
+
 });
