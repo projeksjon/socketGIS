@@ -149,7 +149,20 @@ io.on('connection', function(socket){
             console.log("added layer");
             io.emit('added layer', layer)
         })
-    })
+    });
+
+    socket.on('create file', function(fileName) {
+       File.create({name: fileName, owner: User}, function(err, file) {
+           console.log('created file');
+           io.emit('created file', file);
+       }) ;
+    });
+
+    socket.on('send files', function() {
+        File.find({}, function(err, files){
+            io.emit('all files', files);
+        });
+    });
 
 });
 
