@@ -121,7 +121,28 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     var select = new ol.interaction.Select();
     $scope.map.addInteraction(select);
 
-    select.on()
+    var style = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 255, 255, 0.2)'
+        })
+    });
+
+    select.on('select', function(evt){
+        var selected = evt.selected;
+        var deselected = evt.deselected;
+
+        if (selected.length) {
+            selected.forEach(function(feature){
+                console.info(feature);
+                feature.setStyle(style);
+            });
+        } else {
+            deselected.forEach(function(feature){
+                console.info(feature);
+                feature.setStyle(null);
+            });
+        }
+    });
 
     // a DragBox interaction used to select features by drawing boxes while holding, cmd og ctrl
     $scope.dragBox = new ol.interaction.DragBox({
