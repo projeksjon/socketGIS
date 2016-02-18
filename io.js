@@ -3,11 +3,6 @@
  */
 var io = require('socket.io')();
 
-var socketioJwt = require('socketio-jwt');
 
-io.set('authorization', socketioJwt.authorize({
-    secret: 'hemmelig',
-    handshake: true
-}));
 
 module.exports = io;

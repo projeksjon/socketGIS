@@ -1,11 +1,20 @@
 /**
  * Created by rubenschmidt on 08.02.2016.
  */
-socketGis.factory('socket', function (socketFactory) {
-    var socket = socketFactory();
+socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactory, $cookies) {
+
+    var token = $cookies.get('token');
+
+    var socket = socketFactory({
+        ioSocket: io.connect('', {
+            query: 'token=' + token
+        })
+    });
+
     socket.forward('error');
+
     return socket;
-});
+}]);
 
 socketGis.factory('FileService',['$q', function($q){
     var reader = new FileReader();

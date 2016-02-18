@@ -9,55 +9,11 @@
     </ul>
 </nav>
 <div class="so-file-container has-side-nav" ng-controller="fileController">
-    <div class="so-file">
+    <div class="so-file" ng-repeat="file in files">
         <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
         <div class="so-file-info">
-            <h3 class="so-thin">File title</h3>
+            <h3 class="so-thin">{{file.name}}</h3>
             <h6 class="so-thin">Created at: 27.01.2016</h6>
         </div>
     </div>
-    <div class="so-file">
-        <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
-        <div class="so-file-info">
-            <h3 class="so-thin">File title</h3>
-            <h6 class="so-thin">Created at: 27.01.2016</h6>
-        </div>
-    </div>
-    <div class="so-file">
-        <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
-        <div class="so-file-info">
-            <h3 class="so-thin">File title</h3>
-            <h6 class="so-thin">Created at: 27.01.2016</h6>
-        </div>
-    </div>
-    <div class="so-file">
-        <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
-        <div class="so-file-info">
-            <h3 class="so-thin">File title</h3>
-            <h6 class="so-thin">Created at: 27.01.2016</h6>
-        </div>
-    </div>
-    <div class="so-file">
-        <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
-        <div class="so-file-info">
-            <h3 class="so-thin">File title</h3>
-            <h6 class="so-thin">Created at: 27.01.2016</h6>
-        </div>
-    </div>
-    <div class="so-file">
-        <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
-        <div class="so-file-info">
-            <h3 class="so-thin">File title</h3>
-            <h6 class="so-thin">Created at: 27.01.2016</h6>
-        </div>
-    </div>
-    <div class="so-file">
-        <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
-        <div class="so-file-info">
-            <h3 class="so-thin">File title</h3>
-            <h6 class="so-thin">Created at: 27.01.2016</h6>
-        </div>
-    </div>
-
-
 </div>

@@ -10,6 +10,7 @@ var io = require('./io');
 var jsts = require('jsts');
 var passport = require('passport');
 var jwt = require('jwt-simple');
+var socketioJwt = require('socketio-jwt');
 
 //Mongoose
 mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
@@ -45,6 +46,11 @@ app.use(passport.initialize());
 
 // configure passport
 passport.use(User.createStrategy());
+
+io.set('authorization', socketioJwt.authorize({
+    secret: 'hemmelig',
+    handshake: true
+}));
 
 // routes
 app.use('/user/', routes);
@@ -90,7 +96,7 @@ function sendData(){
 //Socket connection found
 io.on('connection', function(socket){
     console.log('User connected');
-    console.log(socket.handshake.decoded_token.username, 'connected');
+    console.log(socket.client.request.decoded_token.username, 'connected');
     setTimeout(sendData, 200);
     socket.on('add point', function(point){
         Point.create({loc: {type:'Point', coordinates: point.geometry.coordinates}}, function (err, point){
@@ -154,7 +160,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('create file', function(fileName) {
-        File.create({name: fileName, owner: founduser}, function(err, file) {
+        File.create({name: fileName, owner: socket.client.request.decoded_token}, function(err, file) {
             if (err) {console.log(err);}
             console.log('created file');
             io.emit('created file', file);
@@ -163,6 +169,9 @@ io.on('connection', function(socket){
 
     socket.on('send files', function() {
         File.find({}, function(err, files){
+
+            if(err){console.log(err);}
+
             io.emit('all files', files);
         });
     });
