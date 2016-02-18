@@ -47,6 +47,7 @@ app.use(passport.initialize());
 // configure passport
 passport.use(User.createStrategy());
 
+//Use JWT to authorize the socket connection too.
 io.set('authorization', socketioJwt.authorize({
     secret: 'hemmelig',
     handshake: true
@@ -87,17 +88,25 @@ function sendData(){
     Polygon.find({}, function(err, polys){
         io.emit('all polys', polys);
     });
-
-    Layer.find({}, function(err, layers){
-       io.emit('all layers', layers)
-    });
 }
 
 //Socket connection found
 io.on('connection', function(socket){
-    console.log('User connected');
     console.log(socket.client.request.decoded_token.username, 'connected');
-    setTimeout(sendData, 200);
+    socket.on('send files', function(){
+       File.find({}, function(err, files){
+           if(err){console.log(err);}
+           io.emit('all files', files);
+       })
+    });
+    socket.on('getFileLayers', function(fileId){
+        File.findById(fileId)
+            .populate('layers')
+            .exec(function(err, file){
+                if(err){console.log(err);}
+                io.emit('file layers', file.layers);
+        });
+    });
     socket.on('add point', function(point){
         Point.create({loc: {type:'Point', coordinates: point.geometry.coordinates}}, function (err, point){
             //Catch the error.
@@ -152,10 +161,18 @@ io.on('connection', function(socket){
         io.emit('chat message', msg);
     });
 
-    socket.on('add layer', function(layerName){
+    socket.on('add layer', function(layerName, fileId){
         Layer.create({name: layerName}, function(err, layer){
             console.log("added layer");
-            io.emit('added layer', layer)
+            File.findByIdAndUpdate(
+                fileId,
+                {$push: {"layers": layer}},
+                {safe: true, new : true},
+                function(err, model) {
+                    if (err) console.log(err);
+                    io.emit('added layer', model);
+                }
+            );
         })
     });
 
@@ -166,16 +183,6 @@ io.on('connection', function(socket){
             io.emit('created file', file);
         }) ;
     });
-
-    socket.on('send files', function() {
-        File.find({}, function(err, files){
-
-            if(err){console.log(err);}
-
-            io.emit('all files', files);
-        });
-    });
-
 });
 
 

@@ -3,12 +3,12 @@ var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies', 'btford.soc
 
 socketGis.config(function($routeProvider) {
     $routeProvider
-        .when('/file', {
+        .when('/', {
             controller: 'fileController',
             templateUrl: '/partials/file.html',
             access: {restricted: true}
         })
-        .when('/', {
+        .when('/file/:fileId', {
             controller: 'mapController',
             templateUrl: '/partials/map.html',
             access: {restricted: true}
@@ -28,14 +28,10 @@ socketGis.config(function($routeProvider) {
 
 socketGis.run(function ($rootScope, $location, $route, AuthService) {
     AuthService.getAuthStatus().then(function(){
-        //Handle success, user is authenticated
-        $location.path('/');
+        //Success
+    }, function(){
+        //Error, user is not authenticated
+        $location.path('/login');
         $route.reload();
-    });
-    $rootScope.$on('$routeChangeStart', function (event, next, current) {
-        if (next.access.restricted && AuthService.isLoggedIn() === false) {
-            $location.path('/login');
-            $route.reload();
-        }
     });
 });

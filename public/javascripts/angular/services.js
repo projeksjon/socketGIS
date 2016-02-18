@@ -12,6 +12,14 @@ socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactor
     });
 
     socket.forward('error');
+    socket.forward('all points');
+    socket.forward('all layers');
+    socket.forward('all points');
+    socket.forward('all polys');
+    socket.forward('new point');
+    socket.forward('done buffering');
+    socket.forward('added layer');
+    socket.forward('file layers');
 
     return socket;
 }]);

@@ -8,12 +8,15 @@
         <a href="#"><li><i class = "glyphicon glyphicon-star-empty"></i>Favoritter</li></a>
     </ul>
 </nav>
-<div class="so-file-container has-side-nav" ng-controller="fileController">
+<div class="so-file-container has-side-nav">
     <div class="so-file" ng-repeat="file in files">
-        <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
-        <div class="so-file-info">
-            <h3 class="so-thin">{{file.name}}</h3>
-            <h6 class="so-thin">Created at: 27.01.2016</h6>
-        </div>
+        <a ng-href="#/file/{{ file._id }}">
+            <div class="so-file-picture" style="background-image: url('/images/map.png');"></div>
+            <div class="so-file-info">
+                <h3 class="so-thin">{{file.name}}</h3>
+                <h6 class="so-thin">Created at: 27.01.2016</h6>
+            </div>
+        </a>
+
     </div>
 </div>

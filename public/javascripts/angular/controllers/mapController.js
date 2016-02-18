@@ -2,12 +2,12 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 
-socketGis.controller("mapController", function ($scope, $http, $timeout, socket, FileService) {
+socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams','socket', 'FileService',function ($scope, $http, $timeout, $routeParams, socket, FileService) {
     $scope.map = init();
+    socket.emit('getFileLayers', $routeParams.fileId);
     $scope.activeLayers = [];
     $scope.newLayerName ='';
-    $scope.draw;
-    $scope.selectedFeatures;
+    $scope.draw = null;
     //Add the layers here so it registers the event listeners
     $scope.map.addLayer(new ol.layer.Tile({
         source: new ol.source.OSM()
@@ -120,30 +120,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     // a normal select interaction to handle click on features
     var select = new ol.interaction.Select();
     $scope.map.addInteraction(select);
-
-    var style = new ol.style.Style({
-        fill: new ol.style.Fill({
-            color: 'rgba(255, 255, 255, 0.2)'
-        })
-    });
-
-    select.on('select', function(evt){
-        var selected = evt.selected;
-        var deselected = evt.deselected;
-
-        if (selected.length) {
-            selected.forEach(function(feature){
-                console.info(feature);
-                feature.setStyle(style);
-            });
-        } else {
-            deselected.forEach(function(feature){
-                console.info(feature);
-                feature.setStyle(null);
-            });
-        }
-    });
-
+    $scope.selectedFeatures = select.getFeatures();
     // a DragBox interaction used to select features by drawing boxes while holding, cmd og ctrl
     $scope.dragBox = new ol.interaction.DragBox({
         condition: ol.events.condition.platformModifierKeyOnly
@@ -156,13 +133,19 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         // selected features
         var extent = $scope.dragBox.getGeometry().getExtent();
         $scope.vectorSource.forEachFeatureIntersectingExtent(extent, function (feature) {
-            $scope.selectedFeatures.push(feature);
+            if(feature){
+                $scope.selectedFeatures.push(feature);
+            }
         });
         $scope.drawSource.forEachFeatureIntersectingExtent(extent, function(feature){
-            $scope.selectedFeatures.push(feature);
+            if (feature){
+                $scope.selectedFeatures.push(feature);
+            }
         });
         $scope.fileSource.forEachFeatureIntersectingExtent(extent, function(feature){
-            $scope.selectedFeatures.push(feature);
+            if(feature){
+                $scope.selectedFeatures.push(feature);
+            }
         })
     });
 
@@ -231,7 +214,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
 
 
     $scope.addLayer = function(){
-        socket.emit('add layer', $scope.newLayerName);
+        socket.emit('add layer', $scope.newLayerName, $routeParams.fileId);
         //Reset name
         $scope.newLayerName = '';
         $scope.toggle('addLayer');
@@ -283,8 +266,12 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     });
 
     //WEBSOCKET ONS BELOW
+
+    $scope.$on('socket:file layers', function(ev, data){
+        $scope.activeLayers = data;
+    });
+
     //On start of connection, the server sends the stored points. TODO change this.
-    socket.forward('all points', $scope);
     $scope.$on('socket:all points', function (ev, data) {
         data.forEach(function (point) {
             //Create valid geojson
@@ -297,15 +284,12 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
             $scope.vectorSource.addFeature(feature);
         })
     });
-
-    socket.forward('all layers', $scope);
     $scope.$on('socket:all layers', function(ev, data){
         data.forEach(function(layer){
             $scope.activeLayers.push(layer);
         });
     });
 
-    socket.forward('all points', $scope);
     $scope.$on('socket:all lines', function (ev, data) {
         data.forEach(function (line) {
             var l = turf.linestring(line.loc.coordinates);
@@ -316,7 +300,6 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         })
     });
 
-    socket.forward('all polys', $scope);
     $scope.$on('socket:all polys', function (ev, data) {
         data.forEach(function (poly) {
             var p = turf.polygon(poly.loc.coordinates);
@@ -326,7 +309,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         })
     });
 
-    socket.forward('new point', $scope);
+
     $scope.$on('socket:new point', function (ev, data) {
         var p = turf.point(data.loc.coordinates);
         var feature = geoJSONFormat.readFeature(p, {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
@@ -335,7 +318,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         $scope.vectorSource.addFeature(feature);
     });
 
-    socket.forward('done buffering', $scope);
+
     $scope.$on('socket:done buffering', function (ev, data) {
         var geometry = geoJSONFormat.readGeometry(data);
         var feature = new ol.Feature({'geometry': geometry});
@@ -347,7 +330,6 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         });
         socket.emit('add poly', geoObject);
     });
-    socket.forward('added layer', $scope);
     $scope.$on('socket:added layer', function(ev, data){
         $scope.activeLayers.push(data);
     });
@@ -436,4 +418,4 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         return "rgba("+red + "," + green + "," +blue + "," + opacity + ")"
     }
 
-});
+}]);
