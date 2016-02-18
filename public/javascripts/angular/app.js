@@ -3,7 +3,7 @@ var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies', 'btford.soc
 
 socketGis.config(function($routeProvider) {
     $routeProvider
-        .when('/file/', {
+        .when('/file', {
             controller: 'fileController',
             templateUrl: '/partials/file.html',
             access: {restricted: true}

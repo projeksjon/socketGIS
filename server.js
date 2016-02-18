@@ -18,6 +18,7 @@ var Layer = require('./models/layer.js');
 var Point = require('./models/point.js');
 var Polygon = require('./models/polygon.js');
 var LineString = require('./models/linestring.js');
+var File = require('./models/file.js');
 
 //Create instance of express
 var app = express();
@@ -89,6 +90,7 @@ function sendData(){
 //Socket connection found
 io.on('connection', function(socket){
     console.log('User connected');
+    console.log(socket.handshake.decoded_token.username, 'connected');
     setTimeout(sendData, 200);
     socket.on('add point', function(point){
         Point.create({loc: {type:'Point', coordinates: point.geometry.coordinates}}, function (err, point){
@@ -152,10 +154,11 @@ io.on('connection', function(socket){
     });
 
     socket.on('create file', function(fileName) {
-       File.create({name: fileName, owner: User}, function(err, file) {
-           console.log('created file');
-           io.emit('created file', file);
-       }) ;
+        File.create({name: fileName, owner: founduser}, function(err, file) {
+            if (err) {console.log(err);}
+            console.log('created file');
+            io.emit('created file', file);
+        }) ;
     });
 
     socket.on('send files', function() {
