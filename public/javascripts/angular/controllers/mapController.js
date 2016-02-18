@@ -6,12 +6,14 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     $scope.map = init();
     $scope.activeLayers = [];
     $scope.newLayerName ='';
+    $scope.draw;
+    $scope.selectedFeatures;
     //Add the layers here so it registers the event listeners
     $scope.map.addLayer(new ol.layer.Tile({
         source: new ol.source.OSM()
     }));
     $scope.map.addLayer($scope.vector);
-    $scope.map.addLayer($scope.saved);
+    $scope.map.addLayer($scope.savedLayer);
     var geoJSONFormat = new ol.format.GeoJSON();
 
     $scope.interactionTypes = ['None', 'Point', 'LineString', 'Polygon', 'Circle', 'Square', 'Box'];
@@ -38,7 +40,6 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     $scope.addInteraction = function addInteraction(type) {
         $scope.interactionType = type;
         $scope.show.interactionTypes = false;
-        $scope.draw;
 
         var value = $scope.interactionType;
 
@@ -120,12 +121,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     var select = new ol.interaction.Select();
     $scope.map.addInteraction(select);
 
-    //Get the selected features
-    $scope.selectedFeatures = select.getFeatures();
-
-    $scope.map.on('click', function () {
-        $scope.selectedFeatures.clear();
-    });
+    select.on()
 
     // a DragBox interaction used to select features by drawing boxes while holding, cmd og ctrl
     $scope.dragBox = new ol.interaction.DragBox({
@@ -141,7 +137,12 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         $scope.vectorSource.forEachFeatureIntersectingExtent(extent, function (feature) {
             $scope.selectedFeatures.push(feature);
         });
-
+        $scope.drawSource.forEachFeatureIntersectingExtent(extent, function(feature){
+            $scope.selectedFeatures.push(feature);
+        });
+        $scope.fileSource.forEachFeatureIntersectingExtent(extent, function(feature){
+            $scope.selectedFeatures.push(feature);
+        })
     });
 
     //Marker for geolocation
@@ -169,6 +170,8 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
     });
 
     $scope.deleteSelected = function deleteSelected() {
+        //Get the selected features
+        $scope.selectedFeatures = select.getFeatures();
         //Iterate through all the features and delete them.
         $scope.selectedFeatures.forEach(function (feature) {
             var id = feature.getId();
@@ -237,6 +240,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
                     var lay = new ol.layer.Vector({
                         source: $scope.fileSource
                     });
+                    // Add the layer to the map.
                     $scope.map.addLayer(lay);
 
                     var features = geoJSONFormat.readFeatures(feat,{dataProjection: crs, featureProjection: 'EPSG:3857'});
@@ -244,11 +248,14 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
                         var style = new ol.style.Style({
                             fill: new ol.style.Fill({
                                 color: getRandomRgba(0.5)
-                            })
+                            }),
+
                         });
                         f.setStyle(style)
                     });
+                    // Add the features to the filesource, that is already added to the map.
                     $scope.fileSource.addFeatures(features);
+
                 })
             });
         }
@@ -330,7 +337,7 @@ socketGis.controller("mapController", function ($scope, $http, $timeout, socket,
         $scope.fileSource = new ol.source.Vector({wrapX: false});
 
         //Layer for dbFeatures
-        $scope.saved = new ol.layer.Vector({
+        $scope.savedLayer = new ol.layer.Vector({
             source: $scope.vectorSource
         });
 
