@@ -5,7 +5,6 @@ socketGis.controller('fileController', ['$scope', '$cookies', 'socket', function
 
     socket.emit('send files');
 
-
     $scope.createFile = function(filename) {
         socket.emit('create file', 'Test');
     };
