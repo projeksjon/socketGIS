@@ -13,6 +13,5 @@ socketGis.controller('fileController', ['$scope', '$cookies', 'socket', function
     socket.forward('all files', $scope);
     $scope.$on('socket:all files', function(ev, data) {
         $scope.files = data;
-        console.log(data);
     })
 }]);
