@@ -15,7 +15,8 @@ socketGis.controller('loginController',
                 AuthService.login($scope.loginForm.username, $scope.loginForm.password)
                     // handle success
                     .then(function () {
-                        $location.path('/file');
+                        $location.path('/');
+
                         $scope.disabled = false;
                         $scope.loginForm = {};
                     })
