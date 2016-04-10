@@ -63,6 +63,10 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     $scope.$on('socket:chat message', function(ev, msg) {
         msg.is_owner = msg.owner == $scope.username;
         $scope.chatMessages.push(msg);
+        $timeout(function() {
+            var scroller = document.getElementById("autoscroll");
+            scroller.scrollTop = scroller.scrollHeight;
+        }, 0, false);
     })
 
     // Functions
