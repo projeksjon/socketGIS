@@ -38,7 +38,10 @@
         <div class="chat-window">
             <div class="message-container">
                 <div class="test" ng-repeat="msg in chatMessages track by $index">
-                    <div class="message" ng-class="{'one': msg.is_owner, 'two': !msg.is_owner}">{{ msg.message }}</div>
+                    <div class="message" ng-class="{'one': msg.is_owner, 'two': !msg.is_owner}">
+                        {{ msg.message }}
+                        <small class="message-name" ng-if="!msg.is_owner">{{msg.owner}}</small>
+                    </div>
                 </div>
             </div>
             <textarea ng-enter="pushMessage()" ng-model="newMessage" placeholder="Type message ..."></textarea>
