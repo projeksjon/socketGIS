@@ -158,7 +158,10 @@ io.on('connection', function(socket){
     });
 
     socket.on('chat message', function(msg){
-        io.emit('chat message', msg);
+        chatMessage = {}
+        chatMessage.message = msg;
+        chatMessage.owner = socket.client.request.decoded_token.username;
+        io.emit('chat message', chatMessage);
     });
 
     socket.on('add layer', function(layerName, fileId){

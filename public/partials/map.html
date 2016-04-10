@@ -96,8 +96,8 @@
         <div class="chat-header" ng-click="toggle('chatWindow')">Users (2)</div>
         <div class="chat-window">
             <div class="message-container">
-                <div class="test" ng-repeat="msg in chatMessages">
-                    <div class="message one">{{ msg }}</div>
+                <div class="test" ng-repeat="msg in chatMessages track by $index">
+                    <div class="message" ng-class="{'one': msg.is_owner, 'two': !msg.is_owner}">{{ msg.message }}</div>
                 </div>
             </div>
             <textarea ng-enter="pushMessage()" ng-model="newMessage" placeholder="Type message ..."></textarea>

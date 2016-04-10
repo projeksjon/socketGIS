@@ -2,7 +2,7 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 
-socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams','socket', 'FileService',function ($scope, $http, $timeout, $routeParams, socket, FileService) {
+socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams', '$cookies', 'socket', 'FileService', 'jwtHelper', function ($scope, $http, $timeout, $routeParams, $cookies, socket, FileService, jwtHelper) {
     $scope.map = init();
     socket.emit('getFileLayers', $routeParams.fileId);
     $scope.activeLayers = [];
@@ -12,13 +12,16 @@ socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams
     $scope.map.addLayer(new ol.layer.Tile({
         source: new ol.source.OSM()
     }));
+
+    $scope.username = jwtHelper.decodeToken($cookies.get('token')).username;
+
     $scope.map.addLayer($scope.vector);
     $scope.map.addLayer($scope.savedLayer);
     var geoJSONFormat = new ol.format.GeoJSON();
 
     $scope.interactionTypes = ['None', 'Point', 'LineString', 'Polygon', 'Circle', 'Square', 'Box'];
     $scope.interactionType = 'None';
-    $scope.chatMessages = ['Heisann', 'Heihei']
+    $scope.chatMessages = []
     $scope.show = {
         slider: false,
         interactionTypes: false,
@@ -36,7 +39,7 @@ socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams
 
     // Chat
     $scope.pushMessage = function() {
-        $scope.chatMessages.push($scope.newMessage);
+        socket.emit('chat message', $scope.newMessage);
         $scope.newMessage = '';
     }
 
@@ -340,6 +343,11 @@ socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams
     $scope.$on('socket:added layer', function(ev, data){
         $scope.activeLayers.push(data);
     });
+
+    $scope.$on('socket:chat message', function(ev, msg) {
+        msg.is_owner = msg.owner == $scope.username;
+        $scope.chatMessages.push(msg);
+    })
 
     function init() {
         $scope.drawSource = new ol.source.Vector({wrapX: false});
