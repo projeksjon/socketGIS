@@ -7,7 +7,7 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
 
     $scope.username = jwtHelper.decodeToken($cookies.get('token')).username;
     $scope.chatMessages = []
-    
+
     $scope.defaults = {
         scrollWheelZoom: true
     };
@@ -45,8 +45,11 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         $scope.newMessage = '';
     }
 
+    $scope.activeLayers;
+
     socket.emit('getFileLayers', fileId);
     $scope.$on('socket:file layers', function(ev, data){
+        $scope.activeLayers = data;
         leafletData.getMap(function (map) {
             data.forEach(function (layer) {
                 var features = layer.features;
@@ -69,6 +72,12 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
 
     $scope.toggle = function(type) {
         $scope.show[type] = $scope.show[type] ? false : true;
+    };
+    $scope.addLayer = function(){
+        socket.emit('add layer', $scope.newLayerName, $routeParams.fileId);
+        //Reset name
+        $scope.newLayerName = '';
+        $scope.toggle('addLayer');
     };
 
     //File upload functions, used with ng-file-upload
