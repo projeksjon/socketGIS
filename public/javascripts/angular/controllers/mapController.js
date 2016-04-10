@@ -18,11 +18,12 @@ socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams
 
     $scope.interactionTypes = ['None', 'Point', 'LineString', 'Polygon', 'Circle', 'Square', 'Box'];
     $scope.interactionType = 'None';
-
+    $scope.chatMessages = ['Heisann', 'Heihei']
     $scope.show = {
         slider: false,
         interactionTypes: false,
-        addLayer: false
+        addLayer: false,
+        chatWindow: false
     };
 
     // Functions
@@ -32,6 +33,12 @@ socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams
             $scope.map.updateSize();
         }, 300);
     };
+
+    // Chat
+    $scope.pushMessage = function() {
+        $scope.chatMessages.push($scope.newMessage);
+        $scope.newMessage = '';
+    }
 
     $scope.toggle = function(type) {
         $scope.show[type] = $scope.show[type] ? false : true;
