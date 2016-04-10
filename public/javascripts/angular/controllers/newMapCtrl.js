@@ -2,12 +2,16 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 
-socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams','socket', 'FileService','leafletData',function ($scope, $http, $timeout, $routeParams, socket, FileService, leafletData) {
+socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', '$cookies','socket', 'FileService','leafletData', 'jwtHelper',function ($scope, $http, $timeout, $routeParams, $cookies, socket, FileService, leafletData, jwtHelper) {
     var fileId = $routeParams.fileId;
 
+    $scope.username = jwtHelper.decodeToken($cookies.get('token')).username;
+    $scope.chatMessages = []
+    
     $scope.defaults = {
         scrollWheelZoom: true
     };
+
     $scope.center = {
         lat: 63.430,
         lng: 10.395,
@@ -27,8 +31,19 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams','
     $scope.show = {
         slider: false,
         interactionTypes: false,
-        addLayer: false
+        addLayer: false,
+        chatWindow: false
     };
+
+    // Chat
+    $scope.pushMessage = function() {
+        msg = {}
+        msg.message = $scope.newMessage;
+        msg.id = $routeParams.fileId;
+
+        socket.emit('chat message', msg);
+        $scope.newMessage = '';
+    }
 
     socket.emit('getFileLayers', fileId);
     $scope.$on('socket:file layers', function(ev, data){
@@ -39,6 +54,13 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams','
             })
         })
     });
+
+    socket.emit('join room', $routeParams.fileId);
+
+    $scope.$on('socket:chat message', function(ev, msg) {
+        msg.is_owner = msg.owner == $scope.username;
+        $scope.chatMessages.push(msg);
+    })
 
     // Functions
     $scope.toggleSlider = function () {

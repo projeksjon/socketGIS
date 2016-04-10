@@ -33,4 +33,15 @@
 </nav>
 <div class="has-nav has-side-nav-small so-container" ng-class="{'has-extended-side-nav-small':show.slider}">
     <leaflet layers="layers" center="center" defaults="defaults" ngf-drop ng-model="file" ngf-multiple="false" ngf-drag-over-class="'dragover'"></leaflet>
+    <div class="chat-box" ng-class="{'chat-box-open': show.chatWindow}">
+        <div class="chat-header" ng-click="toggle('chatWindow')">Users (2)</div>
+        <div class="chat-window">
+            <div class="message-container">
+                <div class="test" ng-repeat="msg in chatMessages track by $index">
+                    <div class="message" ng-class="{'one': msg.is_owner, 'two': !msg.is_owner}">{{ msg.message }}</div>
+                </div>
+            </div>
+            <textarea ng-enter="pushMessage()" ng-model="newMessage" placeholder="Type message ..."></textarea>
+        </div>
+    </div>
 </div>
