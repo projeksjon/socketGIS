@@ -43,9 +43,6 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams','
     // Functions
     $scope.toggleSlider = function () {
         $scope.show.slider = (!$scope.show.slider);
-        $timeout(function () {
-            $scope.map.updateSize();
-        }, 300);
     };
 
     $scope.toggle = function(type) {
