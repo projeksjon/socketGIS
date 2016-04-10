@@ -16,7 +16,43 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         lat: 63.430,
         lng: 10.395,
         zoom: 12
-    },
+    };
+    var drawnItems = new L.FeatureGroup();
+    $scope.controls ={
+        draw: {
+            position: 'topright',
+            draw: {},
+            edit: { featureGroup: drawnItems}
+        }
+    };
+
+    leafletData.getMap().then(function (map) {
+        var drawnItems = $scope.controls.draw.edit.featureGroup;
+        drawnItems.addTo(map);
+        map.on('draw:created', function (e) {
+            var layer = e.layer, type = e.layerType;
+            drawnItems.addLayer(layer);
+
+            var geoJSON = layer.toGeoJSON();
+            if (type === "circle") {
+                var radius = layer.getRadius();
+                geoJSON.properties.radius = radius;
+                geoJSON.geometry.type = 'Circle';
+            }
+        });
+        map.on('draw:edited', function (e) {
+            var layers = e.layers;
+            layers.eachLayer(function (layer) {
+
+            });
+        });
+
+        map.on('draw:deleted', function (e) {
+            var layers = e.layers;
+            layers.eachLayer(function (layer) {
+            });
+        });
+    })
 
     $scope.layers = {
         baselayers: {
