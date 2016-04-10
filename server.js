@@ -104,7 +104,7 @@ io.on('connection', function(socket){
             .populate('layers')
             .exec(function(err, file){
                 if(err){console.log(err);}
-                io.emit('file layers', file.layers);
+                socket.emit('file layers', file.layers);
         });
     });
     socket.on('add point', function(point){
@@ -187,9 +187,20 @@ io.on('connection', function(socket){
         File.create({name: fileName, owner: socket.client.request.decoded_token}, function(err, file) {
             if (err) {console.log(err);}
             console.log('created file');
-            io.emit('created file', file);
+            socket.emit('created file', file);
         }) ;
     });
+
+    socket.on('update layer', function (layer) {
+        Layer.findByIdAndUpdate(
+            layer._id,
+            {features: layer.features},
+            function (err, model) {
+                if (err) console.log(err);
+                socket.emit('layer update', 'A layer has been updated');
+            }
+        )
+    })
 });
 
 

@@ -8,13 +8,11 @@
     <link rel='stylesheet' href='/stylesheets/so-files.css'/>
     <link rel='stylesheet' href='/stylesheets/so-chat.css'/>
     <link rel='stylesheet' href='/stylesheets/so-text-style.css'/>
-    <link rel='stylesheet' href='/stylesheets/ol3-sidebar.min.css'/>
-    <link rel='stylesheet' href='/stylesheets/ol.css'/>
-    <link rel='stylesheet' href='/stylesheets/ol-custom-style.css'/>
     <link rel='stylesheet' href='bower_components/bootstrap/dist/css/bootstrap.min.css'/>
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <script type='text/javascript' src="//cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="//api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.0/turf.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
 </head>
 <body ng-app="socketGis">
 
@@ -28,6 +26,7 @@
 <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="/javascripts/vendor/underscore-min.js"></script>
 <script src="/javascripts/vendor/ol.js"></script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 <script src="/javascripts/vendor/jquery-sidebar.js"></script>
 <script src="/javascripts/vendor/proj4-compressed.js"></script>
 <script src="/javascripts/vendor/SOSI.min.js"></script>
@@ -39,11 +38,13 @@
 <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
 <script src="bower_components/angular-socket-io/socket.min.js"></script>
 <script src="bower_components/ng-file-upload/ng-file-upload-all.min.js"></script>
+<script src="bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.min.js"></script>
 <script type="text/javascript" src="https://cdn.rawgit.com/auth0/angular-jwt/master/dist/angular-jwt.js"></script>
 
 <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="javascripts/angular/app.js"></script>
 <script src="javascripts/angular/controllers/mapController.js"></script>
+<script src="javascripts/angular/controllers/newMapCtrl.js"></script>
 <script src="javascripts/angular/controllers/fileController.js"></script>
 <script src="javascripts/angular/controllers/loginController.js"></script>
 <script src="javascripts/angular/controllers/registerController.js"></script>

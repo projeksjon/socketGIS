@@ -4,6 +4,7 @@
     </div>
     <div class="login-box">
         <h1 class="so-very-thin so-upper so-white">Logg inn</h1>
+        <div ng-show="error" class="alert alert-danger">{{errorMessage}}</div>
         <form ng-submit="login()">
             <div class="login-field">
                 <span class="fa fa-user"></span>
@@ -22,25 +23,4 @@
             </div>
         </form>
     </div>
-
-    <!--<div class="col-sm-4 col-sm-offset-4 text-center">
-        <h1>
-            Logg inn
-        </h1>
-        <div ng-show="error" class="alert alert-danger">{{errorMessage}}</div>
-        <form class="form" ng-submit="login()">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" class="form-control" name="username" ng-model="loginForm.username" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-control" name="password" ng-model="loginForm.password" required>
-            </div>
-            <div>
-                <button type="submit" class="btn btn-default" ng-disabled="disabled">Login</button>
-            </div>
-            <small><a ng-href="#/register">Registrer deg her</a></small>
-        </form>
-    </div>-->
 </div>

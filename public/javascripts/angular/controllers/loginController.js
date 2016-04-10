@@ -14,18 +14,16 @@ socketGis.controller('loginController',
                 // call login from service
                 AuthService.login($scope.loginForm.username, $scope.loginForm.password)
                     // handle success
-                    .then(function () {
+                    .then(function (response) {
                         $location.path('/');
 
                         $scope.disabled = false;
                         $scope.loginForm = {};
-                    })
-                    // handle error
-                    .catch(function () {
+                    }, function (response) {
                         $scope.error = true;
                         $scope.errorMessage = "Feil brukernavn eller passord";
                         $scope.disabled = false;
                         $scope.loginForm = {};
-                    });
+                    })
             };
 }]);

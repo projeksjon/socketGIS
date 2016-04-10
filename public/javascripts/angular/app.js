@@ -1,5 +1,4 @@
-var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies', 'btford.socket-io', 'ngFileUpload', 'angular-jwt']);
-
+var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies', 'btford.socket-io', 'ngFileUpload', 'leaflet-directive', 'angular-jwt']);
 
 socketGis.config(function($routeProvider) {
     $routeProvider
@@ -9,8 +8,8 @@ socketGis.config(function($routeProvider) {
             access: {restricted: true}
         })
         .when('/file/:fileId', {
-            controller: 'mapController',
-            templateUrl: '/partials/map.html',
+            controller: 'newMapCtrl',
+            templateUrl: '/partials/new_map.html',
             access: {restricted: true}
         })
         .when('/login',{

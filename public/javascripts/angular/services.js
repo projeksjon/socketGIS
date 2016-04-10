@@ -20,6 +20,7 @@ socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactor
     socket.forward('done buffering');
     socket.forward('added layer');
     socket.forward('file layers');
+    socket.forward('layer update');
     socket.forward('chat message');
 
     return socket;
@@ -124,19 +125,16 @@ socketGis.factory('AuthService',
                 $http.post('/user/login', {username: username, password: password})
 
                     .then(function (response) {
-                        // handle success
-                        if(response.status === 200 && response.data.token){
-                            user = true;
-                            $http.defaults.headers.common.Authorization = 'Token ' + response.data.token;
-                            $cookies.put('token', response.data.token);
-                            deferred.resolve();
+                    // handle success
+                        user = true;
+                        $http.defaults.headers.common.Authorization = 'Token ' + response.data.token;
+                        $cookies.put('token', response.data.token);
+                        deferred.resolve();
 
-                        } else {
-                            user = false;
-                            deferred.reject();
-                        }
                     }, function(response){
                         // handle error
+                        user = false;
+                        deferred.reject();
                     });
 
                 // return promise object
