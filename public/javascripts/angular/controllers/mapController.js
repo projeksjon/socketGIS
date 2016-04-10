@@ -5,6 +5,7 @@
 socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams', '$cookies', 'socket', 'FileService', 'jwtHelper', function ($scope, $http, $timeout, $routeParams, $cookies, socket, FileService, jwtHelper) {
     $scope.map = init();
     socket.emit('getFileLayers', $routeParams.fileId);
+    socket.emit('join room', $routeParams.fileId);
     $scope.activeLayers = [];
     $scope.newLayerName ='';
     $scope.draw = null;
@@ -39,7 +40,11 @@ socketGis.controller("mapController", ['$scope','$http','$timeout','$routeParams
 
     // Chat
     $scope.pushMessage = function() {
-        socket.emit('chat message', $scope.newMessage);
+        msg = {}
+        msg.message = $scope.newMessage;
+        msg.id = $routeParams.fileId;
+
+        socket.emit('chat message', msg);
         $scope.newMessage = '';
     }
 

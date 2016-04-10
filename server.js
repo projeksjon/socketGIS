@@ -157,11 +157,15 @@ io.on('connection', function(socket){
         makeBuffer(buffer.feature, buffer.distance);
     });
 
+    socket.on('join room', function(id) {
+        socket.join(id);
+    });
+
     socket.on('chat message', function(msg){
         chatMessage = {}
-        chatMessage.message = msg;
+        chatMessage.message = msg.message;
         chatMessage.owner = socket.client.request.decoded_token.username;
-        io.emit('chat message', chatMessage);
+        io.to(msg.id).emit('chat message', chatMessage);
     });
 
     socket.on('add layer', function(layerName, fileId){
