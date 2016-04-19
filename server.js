@@ -117,6 +117,26 @@ io.on('connection', function (socket) {
         console.log('Added geofeature');
     });
 
+    socket.on('make buffer', function(features) {
+        makeBuffer(features);
+    });
+
+    socket.on('make intersection', function(features) {
+        intersect(features);
+    });
+
+    socket.on('make difference', function(features) {
+        difference(features);
+    });
+
+    socket.on('make union', function(features) {
+        union(features);
+    });
+
+    socket.on('make symDifference', function(features) {
+        symDifference(features);
+    });
+
     socket.on('add point', function (point) {
         Point.create({loc: {type: 'Point', coordinates: point.geometry.coordinates}}, function (err, point) {
             //Catch the error.
@@ -245,4 +265,36 @@ function makeBuffer(feature, distance) {
     var jstsGeom = reader.read(feature).geometry;
     var buffered = jstsGeom.buffer(distance);
     io.emit('done buffering', JSON.stringify(writer.write(buffered)));
+}
+
+function intersect(features) {
+    var id = features[0].id;
+    var a = reader.read(features[0]).geometry;
+    var b = reader.read(features[1]).geometry;
+    var intersection = a.intersection(b);
+    io.to(id).emit('done intersection', JSON.stringify(writer.write(intersection)));
+}
+
+function difference(features) {
+    var id = features[0].id;
+    var a = reader.read(features[0]).geometry;
+    var b = reader.read(features[1]).geometry;
+    var difference = a.difference(b);
+    io.to(id).emit('done difference', JSON.stringify(writer.write(difference)));
+}
+
+function union(features) {
+    var id = features[0].id;
+    var a = reader.read(features[0]).geometry;
+    var b = reader.read(features[1]).geometry;
+    var union = a.union(b);
+    io.to(id).emit('done union', JSON.stringify(writer.write(union)));
+}
+
+function symDifference(features) {
+    var id = features[0].id;
+    var a = reader.read(features[0]).geometry;
+    var b = reader.read(features[1]).geometry;
+    var symDifference = a.symDifference(b);
+    io.to(id).emit('done union', JSON.stringify(writer.write(symDifference)));
 }
