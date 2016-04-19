@@ -31,27 +31,19 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         var drawnItems = $scope.controls.draw.edit.featureGroup;
         drawnItems.addTo(map);
         map.on('draw:created', function (e) {
-            var layer = e.layer, type = e.layerType;
+            var layer = e.layer;
             drawnItems.addLayer(layer);
 
             var geoJSON = layer.toGeoJSON();
             geoJSON.id = $routeParams.fileId;
-
-            if (type === 'circle') {
-                var radius = layer.getRadius();
-                geoJSON.properties.radius = radius;
-                geoJSON.geometry.type = 'Circle';
-            }
 
             socket.emit('add feature', geoJSON);
         });
         map.on('draw:edited', function (e) {
             var layers = e.layers;
             layers.eachLayer(function (layer) {
-
             });
         });
-
         map.on('draw:deleted', function (e) {
             var layers = e.layers;
             layers.eachLayer(function (layer) {

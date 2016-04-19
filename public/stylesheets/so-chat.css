@@ -3,6 +3,7 @@
   bottom: 0;
   right: 100px;
   width: 300px;
+  overflow: hidden;
   max-height: 35px;
   -webkit-transition: max-height 300ms ease;
     -webkit-transition--moz-transition: max-height 300ms ease;
