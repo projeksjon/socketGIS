@@ -203,7 +203,6 @@ io.on('connection', function(socket){
     })
 });
 
-
 //===================GIS Methods===================
 
 //JSTS parser to read geojson ++
