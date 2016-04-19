@@ -122,16 +122,16 @@ io.on('connection', function (socket) {
         makeBuffer(features, distance, fileId);
     });
 
-    socket.on('make intersection', function(features) {
-        intersect(features);
+    socket.on('make intersection', function(obj) {
+        intersect(obj);
     });
 
-    socket.on('make difference', function(features) {
-        difference(features);
+    socket.on('make difference', function(obj) {
+        difference(obj);
     });
 
-    socket.on('make union', function(features) {
-        union(features);
+    socket.on('make union', function(obj) {
+        union(obj);
     });
 
     socket.on('make symDifference', function(features) {
@@ -273,26 +273,22 @@ function makeBuffer(feature, distance, fileId) {
     io.to(fileId).emit('done buffering', obj);
 }
 
-function intersect(features) {
-    var id = features.id;
-    var intersection = turf.intersect(features.first, features.second);
+function intersect(obj) {
+    var id = obj.id;
+    var intersection = turf.intersect(obj.first, obj.second);
     io.to(id).emit('done intersection', intersection);
 }
 
-function difference(features) {
-    var id = features[0].id;
-    var a = reader.read(features[0]).geometry;
-    var b = reader.read(features[1]).geometry;
-    var difference = a.difference(b);
-    io.to(id).emit('done difference', JSON.stringify(writer.write(difference)));
+function difference(obj) {
+    var id = obj.id;
+    var difference = turf.difference(obj.first, obj.second)
+    io.to(id).emit('done difference', difference);
 }
 
-function union(features) {
-    var id = features[0].id;
-    var a = reader.read(features[0]).geometry;
-    var b = reader.read(features[1]).geometry;
-    var union = a.union(b);
-    io.to(id).emit('done union', JSON.stringify(writer.write(union)));
+function union(obj) {
+    var id = obj.id;
+    var union = turf.union(obj.first, obj.second)
+    io.to(id).emit('done union', union);
 }
 
 function symDifference(features) {

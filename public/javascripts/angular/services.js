@@ -19,6 +19,8 @@ socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactor
     socket.forward('new point');
     socket.forward('done buffering');
     socket.forward('done intersection');
+    socket.forward('done difference');
+    socket.forward('done union');
     socket.forward('added layer');
     socket.forward('file layers');
     socket.forward('layer update');

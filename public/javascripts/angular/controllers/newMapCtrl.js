@@ -238,6 +238,60 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         socket.emit('make intersection', obj)
     }
 
+    $scope.differenceSelected = function () {
+        if ($scope.featureList.length > 2) {
+            alert("Du kan kun ha to aktive lag for å velge difference.")
+            return
+        } else if ($scope.featureList.length < 2) {
+            alert("Du må velge to lag som skal brukes for difference.")
+            return
+        }
+        var obj = {
+            id: fileId,
+            first: $scope.featureList[0].toGeoJSON(),
+            second: $scope.featureList[0].toGeoJSON()
+        };
+        socket.emit('make difference', obj)
+    }
+    $scope.unionSelected = function () {
+        if ($scope.featureList.length > 2) {
+            alert("Du kan kun ha to aktive lag for å velge difference.")
+            return
+        } else if ($scope.featureList.length < 2) {
+            alert("Du må velge to lag som skal brukes for difference.")
+            return
+        }
+        var obj = {
+            id: fileId,
+            first: $scope.featureList[0].toGeoJSON(),
+            second: $scope.featureList[0].toGeoJSON()
+        };
+        socket.emit('make union', obj)
+    }
+
+    $scope.$on('socket:done difference', function (ev, obj) {
+        console.log(obj);
+        var myStyle = {
+            "color": '#ffa500',
+            "opacity": 1
+        };
+        L.geoJson(obj, {
+            style: myStyle,
+        }).addTo($scope.map);
+
+    });
+    $scope.$on('socket:done union', function (ev, obj) {
+        console.log(obj);
+        var myStyle = {
+            "color": '#ffa500',
+            "opacity": 1
+        };
+        L.geoJson(obj, {
+            style: myStyle,
+        }).addTo($scope.map);
+
+    });
+
     $scope.$on('socket:done intersection', function (ev, obj) {
         console.log(obj);
         var myStyle = {
