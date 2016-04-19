@@ -22,6 +22,7 @@ socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactor
     socket.forward('file layers');
     socket.forward('layer update');
     socket.forward('chat message');
+    socket.forward('add feature');
 
     return socket;
 }]);

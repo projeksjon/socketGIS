@@ -107,6 +107,12 @@ io.on('connection', function(socket){
                 socket.emit('file layers', file.layers);
         });
     });
+
+    socket.on('add feature', function(geoJson) {
+        console.log(geoJson);
+        io.to(geoJson.id).emit('add feature', geoJson);
+    });
+
     socket.on('add point', function(point){
         Point.create({loc: {type:'Point', coordinates: point.geometry.coordinates}}, function (err, point){
             //Catch the error.
