@@ -31,11 +31,17 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         var drawnItems = $scope.controls.draw.edit.featureGroup;
         drawnItems.addTo(map);
         map.on('draw:created', function (e) {
-            var layer = e.layer;
+            var layer = e.layer, type = e.layerType;
             drawnItems.addLayer(layer);
 
             var geoJSON = layer.toGeoJSON();
             geoJSON.id = $routeParams.fileId;
+
+            if (type === 'circle') {
+                var radius = layer.getRadius();
+                geoJSON.properties.radius = radius;
+                geoJSON.geometry.type = 'Circle';
+            }
 
             socket.emit('add feature', geoJSON);
         });
@@ -92,12 +98,8 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     });
 
     $scope.$on('socket:add feature', function(ev, data) {
-        console.log("Halla");
-        leafletData.getMap(function (map) {
-            var features = data.features;
-            console.log(features);
-            L.geoJson(features).addTo(map);
-        });
+        console.log(data);
+        L.geoJson(data).addTo($scope.map);
     });
 
     socket.emit('join room', $routeParams.fileId);

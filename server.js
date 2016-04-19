@@ -115,6 +115,8 @@ io.on('connection', function (socket) {
     socket.on('add feature', function (geoJson) {
         console.log(geoJson);
         io.to(geoJson.id).emit('add feature', geoJson);
+
+        
     });
 
     socket.on('add point', function (point) {
