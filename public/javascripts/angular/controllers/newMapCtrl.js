@@ -6,7 +6,7 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     var fileId = $routeParams.fileId;
 
     $scope.username = jwtHelper.decodeToken($cookies.get('token')).username;
-    $scope.chatMessages = []
+    $scope.chatMessages = [];
 
     $scope.defaults = {
         scrollWheelZoom: true
@@ -25,8 +25,9 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
             edit: { featureGroup: drawnItems}
         }
     };
-
+    $scope.map;
     leafletData.getMap().then(function (map) {
+        $scope.map = map;
         var drawnItems = $scope.controls.draw.edit.featureGroup;
         drawnItems.addTo(map);
         map.on('draw:created', function (e) {
@@ -122,36 +123,25 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         $scope.newLayerName = '';
         $scope.toggle('addLayer');
     };
-
+    var fileData;
     //File upload functions, used with ng-file-upload
     $scope.$watch('file', function () {
         if ($scope.file != null) {
             FileService.handleFile($scope.file).then(function(data){
-                console.log(data);
-                leafletData.getMap().then(function (map) {
-                    data.forEach(function (collection) {
-                        var myStyle = {
-                            "color": '#'+Math.floor(Math.random()*16777215).toString(16),
-                            "opacity": 1
-                        };
-                        L.geoJson(collection, {
-                            style: myStyle,
-                            onEachFeature: function (feature, layer) {
-                                console.log(layer);
-                                if(feature.properties.OBJTYPE){
-                                    console.log(feature.properties.OBJTYPE);
-                                    layer.bindPopup(feature.properties.OBJTYPE);
-                                }
-                            }
-                        }).addTo(map);
+                fileData = data;
+                fileData.forEach(function (collection) {
 
-                    })
+                    // Add a layer for each
 
+
+                    var myStyle = {
+                        "color": '#'+Math.floor(Math.random()*16777215).toString(16),
+                        "opacity": 1
+                    };
+                    L.geoJson(collection, myStyle).addTo($scope.map);
+                    console.log(collection);
                 });
             });
         }
     });
 }]);
-/**
- * Created by rubenschmidt on 10.04.2016.
- */
