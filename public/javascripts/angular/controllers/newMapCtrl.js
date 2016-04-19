@@ -52,6 +52,9 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
             layers.eachLayer(function (layer) {
             });
         });
+        map.on('click', function (e) {
+            $scope.unselectAll();
+        })
     });
 
     $scope.layers = {
@@ -90,7 +93,8 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
             var features = layer.features;
             var geolay = L.geoJson(features, {
                 style: {
-                    "opacity": 1
+                    "opacity": 1,
+                    "color": '#' + Math.floor(Math.random() * 16777215).toString(16)
                 },
                 onEachFeature: function (feature, lay) {
                     var popupInfo = "";
@@ -118,6 +122,7 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
     socket.emit('join room', $routeParams.fileId);
 
     $scope.$on('socket:chat message', function (ev, msg) {
+        console.log(msg);
         msg.is_owner = msg.owner == $scope.username;
         $scope.chatMessages.push(msg);
         $timeout(function () {
@@ -161,14 +166,7 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
                         "opacity": 1
                     };
                     L.geoJson(collection, {
-                        style: myStyle,
-                        onEachFeature: function (feature, layer) {
-                            console.log(layer);
-                            if (feature.properties) {
-                                console.log(feature.properties);
-                                layer.bindPopup("Hei på deg!!");
-                            }
-                        }
+                        style: myStyle
                     }).addTo($scope.map);
                 });
             });
@@ -189,6 +187,9 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
             if (layer.isActive) {
                 $scope.map.removeLayer(layer.geoLayers)
                 socket.emit('delete layer', layer._id)
+
+                var i = $scope.activeLayers.indexOf(layer);
+                $scope.activeLayers.splice(i, 1)
             }
         });
     }
@@ -205,7 +206,8 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
 
 
     $scope.bufferSelected = function () {
-        socket.emit('make buffer', $scope.featureList[0].toGeoJSON());
+        socket.emit('make buffer', $scope.featureList[0].toGeoJSON(), $scope.bufferDistance, fileId);
+        $scope.unselectAll();
     };
 
     $scope.$on('socket:done buffering', function (ev, obj) {
@@ -238,7 +240,13 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
 
     $scope.$on('socket:done intersection', function (ev, obj) {
         console.log(obj);
-        L.geoJson(obj).addTo($scope.map);
+        var myStyle = {
+            "color": '#ffa500',
+            "opacity": 1
+        };
+        L.geoJson(obj, {
+            style: myStyle,
+        }).addTo($scope.map);
 
     });
 
@@ -281,4 +289,15 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
             "opacity": 0.5
         });
     }
+
+    $scope.unselectAll = function () {
+        $scope.featureList.forEach(function (l) {
+            l.setStyle({
+                "opacity": 1
+            });
+        })
+        $scope.featureList = [];
+        $scope.selectedFeature = null;
+    }
+
 }]);

@@ -19,6 +19,7 @@
 
             <div class="container-header so-very-thin so-upper">Operasjoner</div>
             <div class="container-field" ng-click="deleteSelectedFeature()">Slett valgt element</div>
+            <div class="container-field" ng-click="unselectAll()">Tøm valgte elementer</div>
             <div class="container-field" data-toggle="modal" data-target="#bufferModal">Buffer</div>
             <div class="container-field" ng-click="intersectSelected()">Intersection</div>
             <div class="container-field">Difference</div>
@@ -58,7 +59,7 @@
                 <h4 class="modal-title" id="bufferModalLabel">Buffer</h4>
             </div>
             <div class="modal-body">
-                <p>{{ selectedFeature.feature.properties }}</p>
+                <input type="number" ng-model="bufferDistance">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

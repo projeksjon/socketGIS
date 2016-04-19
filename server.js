@@ -118,8 +118,8 @@ io.on('connection', function (socket) {
         console.log('Added geofeature');
     });
 
-    socket.on('make buffer', function(features) {
-        makeBuffer(features, 10);
+    socket.on('make buffer', function(features, distance, fileId) {
+        makeBuffer(features, distance, fileId);
     });
 
     socket.on('make intersection', function(features) {
@@ -263,14 +263,14 @@ io.on('connection', function (socket) {
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
-function makeBuffer(feature, distance) {
+function makeBuffer(feature, distance, fileId) {
     var parentLayer = feature.properties.parentLayer;
-    var bufferd = turf.buffer(feature, 500, 'meters');
+    var bufferd = turf.buffer(feature, distance, 'meters');
     var obj = {
         geoJson: bufferd,
         parentLayer: parentLayer
     };
-    io.emit('done buffering', obj);
+    io.to(fileId).emit('done buffering', obj);
 }
 
 function intersect(features) {
