@@ -85,11 +85,9 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     socket.emit('getFileLayers', fileId);
     $scope.$on('socket:file layers', function(ev, data){
         $scope.activeLayers = data;
-        leafletData.getMap(function (map) {
-            data.forEach(function (layer) {
-                var features = layer.features;
-                L.geoJson(features).addTo(map);
-            })
+        data.forEach(function (layer) {
+            var features = layer.features;
+            L.geoJson(features).addTo($scope.map);
         })
     });
 
@@ -135,8 +133,13 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
                 fileData = data;
                 fileData.forEach(function (collection) {
 
-                    // Add a layer for each
+                    var name = collection.fileName;
+                    if (name === undefined || name === null){
+                        name = "1234"
+                    }
 
+                    // Add a layer for each
+                    socket.emit('add layer', name, fileId, collection);
 
                     var myStyle = {
                         "color": '#'+Math.floor(Math.random()*16777215).toString(16),

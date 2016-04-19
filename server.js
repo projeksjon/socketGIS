@@ -40,7 +40,7 @@ var routes = require('./routes/api.js');
 app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser('keyboard cat'));
 app.use(passport.initialize());
 
@@ -56,12 +56,12 @@ io.set('authorization', socketioJwt.authorize({
 // routes
 app.use('/user/', routes);
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     var err = new Error('Ikke funnet');
     err.status = 404;
     next(err);
@@ -75,46 +75,50 @@ if (app.get('env') === 'development') {
 module.exports = app;
 
 
-function sendData(){
+function sendData() {
     console.log('Sent data');
-    Point.find({}, function(err, points){
+    Point.find({}, function (err, points) {
         //Broadcast all points
         io.emit('all points', points);
     });
 
-    LineString.find({}, function(err, lines){
+    LineString.find({}, function (err, lines) {
         io.emit('all lines', lines);
     });
-    Polygon.find({}, function(err, polys){
+    Polygon.find({}, function (err, polys) {
         io.emit('all polys', polys);
     });
 }
 
 //Socket connection found
-io.on('connection', function(socket){
+io.on('connection', function (socket) {
     console.log(socket.client.request.decoded_token.username, 'connected');
-    socket.on('send files', function(){
-       File.find({}, function(err, files){
-           if(err){console.log(err);}
-           io.emit('all files', files);
-       })
+    socket.on('send files', function () {
+        File.find({}, function (err, files) {
+            if (err) {
+                console.log(err);
+            }
+            io.emit('all files', files);
+        })
     });
-    socket.on('getFileLayers', function(fileId){
+    socket.on('getFileLayers', function (fileId) {
         File.findById(fileId)
             .populate('layers')
-            .exec(function(err, file){
-                if(err){console.log(err);}
+            .exec(function (err, file) {
+                if (err) {
+                    console.log(err);
+                }
                 socket.emit('file layers', file.layers);
-        });
+            });
     });
 
-    socket.on('add feature', function(geoJson) {
+    socket.on('add feature', function (geoJson) {
         console.log(geoJson);
         io.to(geoJson.id).emit('add feature', geoJson);
     });
 
-    socket.on('add point', function(point){
-        Point.create({loc: {type:'Point', coordinates: point.geometry.coordinates}}, function (err, point){
+    socket.on('add point', function (point) {
+        Point.create({loc: {type: 'Point', coordinates: point.geometry.coordinates}}, function (err, point) {
             //Catch the error.
             if (err) console.log(err);
             //Send to all others than the sender
@@ -123,16 +127,16 @@ io.on('connection', function(socket){
         });
     });
 
-    socket.on('add line', function(line){
-        LineString.create({ loc:  {type:'LineString', coordinates: line.geometry.coordinates}}, function (err, line){
+    socket.on('add line', function (line) {
+        LineString.create({loc: {type: 'LineString', coordinates: line.geometry.coordinates}}, function (err, line) {
             //Catch the error.
             if (err) console.log(err);
             console.log('added line');
             socket.broadcast.emit('new line', line);
         });
     });
-    socket.on('add poly', function(poly){
-        Polygon.create({ loc:  {type:'Polygon', coordinates: poly.geometry.coordinates}}, function (err, poly){
+    socket.on('add poly', function (poly) {
+        Polygon.create({loc: {type: 'Polygon', coordinates: poly.geometry.coordinates}}, function (err, poly) {
             //Catch the error.
             if (err) console.log(err);
             console.log('added poly');
@@ -140,48 +144,60 @@ io.on('connection', function(socket){
         });
     });
 
-    socket.on('delete point', function(id){
+    socket.on('delete point', function (id) {
         console.log('delete point');
-        Point.remove({_id: id},function(err,p){
+        Point.remove({_id: id}, function (err, p) {
             if (err) console.log(err);
         });
     });
-    socket.on('delete line', function(id){
-        LineString.remove({_id: id},function(err,p){
+    socket.on('delete line', function (id) {
+        LineString.remove({_id: id}, function (err, p) {
             if (err) console.log(err);
         });
     });
 
-    socket.on('delete poly', function(id){
-        Polygon.remove({_id: id},function(err,p){
+    socket.on('delete poly', function (id) {
+        Polygon.remove({_id: id}, function (err, p) {
             if (err) console.log(err);
         });
     });
 
     //Use jtst so make a buffer around the features.
-    socket.on('bufferFeature', function(buffer){
+    socket.on('bufferFeature', function (buffer) {
         makeBuffer(buffer.feature, buffer.distance);
     });
 
-    socket.on('join room', function(id) {
+    socket.on('join room', function (id) {
         socket.join(id);
     });
 
-    socket.on('chat message', function(msg){
+    socket.on('chat message', function (msg) {
         chatMessage = {}
         chatMessage.message = msg.message;
         chatMessage.owner = socket.client.request.decoded_token.username;
         io.to(msg.id).emit('chat message', chatMessage);
     });
 
-    socket.on('add layer', function(layerName, fileId){
-        Layer.create({name: layerName}, function(err, layer){
+    socket.on('add layer', function (layerName, fileId, features) {
+        if (features != null) {
+            console.log("features");
+            var obj = {
+                name: layerName,
+                features: features
+            }
+        } else {
+            var obj = {
+                name: layerName,
+            }
+        }
+        Layer.create(obj, function (err, layer) {
             console.log("added layer");
+
             File.findByIdAndUpdate(
                 fileId,
                 {$push: {"layers": layer}},
-                {safe: true, new : true},
-                function(err, model) {
+                {safe: true, new: true},
+                function (err, model) {
                     if (err) console.log(err);
                     io.emit('added layer', model);
                 }
@@ -189,12 +205,14 @@ io.on('connection', function(socket){
         })
     });
 
-    socket.on('create file', function(fileName) {
-        File.create({name: fileName, owner: socket.client.request.decoded_token}, function(err, file) {
-            if (err) {console.log(err);}
+    socket.on('create file', function (fileName) {
+        File.create({name: fileName, owner: socket.client.request.decoded_token}, function (err, file) {
+            if (err) {
+                console.log(err);
+            }
             console.log('created file');
             socket.emit('created file', file);
-        }) ;
+        });
     });
 
     socket.on('update layer', function (layer) {
@@ -216,7 +234,7 @@ var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
 
-function makeBuffer(feature, distance){
+function makeBuffer(feature, distance) {
     var jstsGeom = reader.read(feature).geometry;
     var buffered = jstsGeom.buffer(distance);
     io.emit('done buffering', JSON.stringify(writer.write(buffered)));
