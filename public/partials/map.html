@@ -64,17 +64,6 @@
     <div class="so-side-nav-small-slider slide-right" ng-show="show.slider">
         <div class="so-side-nav-small-slider-header so-white so-center">H j e m</div>
         <div class="so-side-nav-small-slider-container">
-            <div class="container-header so-very-thin so-upper">Interaction types</div>
-            <div class="container-field" ng-click="toggle('interactionTypes')">
-                {{interactionType}}
-                <div class="container-field-icon">
-                    <span class="fa fa-chevron-right" ng-show="!show.interactionTypes"></span>
-                    <span class="fa fa-chevron-down" ng-show="show.interactionTypes"></span>
-                </div>
-            </div>
-            <div class="container-sub-fields" ng-class="{'container-sub-fields-active': show.interactionTypes}">
-                <div class="container-sub-field" ng-click="addInteraction(type)" ng-repeat="type in interactionTypes">{{type}}</div>
-            </div>
             <div class="container-field" ng-click="deleteSelected()">Slett valgte objekter</div>
             <div class="container-header so-very-thin so-upper">Lag</div>
             <div class="container-field" ng-click="toggle('addLayer')" ng-hide="show.addLayer">Legg til lag</div>

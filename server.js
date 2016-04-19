@@ -74,7 +74,6 @@ if (app.get('env') === 'development') {
 
 module.exports = app;
 
-
 function sendData() {
     console.log('Sent data');
     Point.find({}, function (err, points) {
@@ -90,7 +89,7 @@ function sendData() {
     });
 }
 
-//Socket connection found
+// Socket connection found
 io.on('connection', function (socket) {
     console.log(socket.client.request.decoded_token.username, 'connected');
     socket.on('send files', function () {
@@ -113,10 +112,9 @@ io.on('connection', function (socket) {
     });
 
     socket.on('add feature', function (geoJson) {
-        console.log(geoJson);
+        // Sendt polygon to all other listeners
         io.to(geoJson.id).emit('add feature', geoJson);
-
-        
+        console.log('Added geofeature');
     });
 
     socket.on('add point', function (point) {
@@ -137,6 +135,7 @@ io.on('connection', function (socket) {
             socket.broadcast.emit('new line', line);
         });
     });
+
     socket.on('add poly', function (poly) {
         Polygon.create({loc: {type: 'Polygon', coordinates: poly.geometry.coordinates}}, function (err, poly) {
             //Catch the error.
@@ -152,6 +151,7 @@ io.on('connection', function (socket) {
             if (err) console.log(err);
         });
     });
+
     socket.on('delete line', function (id) {
         LineString.remove({_id: id}, function (err, p) {
             if (err) console.log(err);
@@ -234,7 +234,6 @@ io.on('connection', function (socket) {
 //JSTS parser to read geojson ++
 var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
-
 
 function makeBuffer(feature, distance) {
     var jstsGeom = reader.read(feature).geometry;

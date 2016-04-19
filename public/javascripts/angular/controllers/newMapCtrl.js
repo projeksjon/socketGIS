@@ -103,7 +103,7 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
             var scroller = document.getElementById("autoscroll");
             scroller.scrollTop = scroller.scrollHeight;
         }, 0, false);
-    })
+    });
 
     // Functions
     $scope.toggleSlider = function () {
