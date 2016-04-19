@@ -25,6 +25,9 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
             edit: { featureGroup: drawnItems}
         }
     };
+    $scope.selectedFeature;
+    $scope.selectedLayer;
+
     $scope.map;
     leafletData.getMap().then(function (map) {
         $scope.map = map;
@@ -49,6 +52,11 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
             layers.eachLayer(function (layer) {
             });
         });
+
+        map.on('click', function (e) {
+            console.log(e.target);
+            $scope.selectedFeature.resetStyle(e.target)
+        })
     });
 
     $scope.layers = {
@@ -83,10 +91,24 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     socket.emit('getFileLayers', fileId);
     $scope.$on('socket:file layers', function(ev, data){
         $scope.activeLayers = data;
-        data.forEach(function (layer) {
+        $scope.activeLayers.forEach(function (layer) {
             var features = layer.features;
-            L.geoJson(features).addTo($scope.map);
-        })
+            var geolay = L.geoJson(features, {
+                onEachFeature: function (feature, layer) {
+                    var popupInfo = "";
+                    var prop = feature.properties;
+                    Object.keys(prop).forEach(function (key, index) {
+                        popupInfo += "<p>"+key + ": "+prop[key] +"</p>"
+                    });
+                    layer.bindPopup(popupInfo);
+                }
+            });
+            geolay.on('click', highlightFeature);
+            geolay.addTo($scope.map);
+            layer.geoLayers = geolay;
+        });
+        $scope.selectedLayer = $scope.activeLayers[0];
+        $scope.activeLayers[0].isActive = true;
     });
 
     $scope.$on('socket:add feature', function(ev, data) {
@@ -139,10 +161,40 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
                         "color": '#'+Math.floor(Math.random()*16777215).toString(16),
                         "opacity": 1
                     };
-                    L.geoJson(collection, myStyle).addTo($scope.map);
+                    L.geoJson(collection, {
+                        style: myStyle,
+                        onEachFeature: function (feature, layer) {
+                            console.log(layer);
+                            if(feature.properties){
+                                console.log(feature.properties);
+                                layer.bindPopup("Hei på deg!!");
+                            }
+                        }
+                    }).addTo($scope.map);
+
                     console.log(collection);
                 });
             });
         }
     });
+
+    $scope.deleteSelected = function () {
+        $scope.map.removeLayer($scope.selectedFeature)
+    };
+
+    function highlightFeature(e) {
+        var layer = e.layer;
+        $scope.selectedFeature = layer;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+        }
+    }
 }]);

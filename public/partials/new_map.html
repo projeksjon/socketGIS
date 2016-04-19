@@ -12,7 +12,7 @@
                 <input class="form-control" type="text" ng-model="newLayerName" placeholder="Navn">
                 <button class="btn-default" ng-click="addLayer()">Legg til</button>
             </div>
-            <div class="container-field" ng-repeat="lay in activeLayers">
+            <div class="container-field" ng-repeat="lay in activeLayers" ng-class="{'container-sub-fields-active': lay.isActive}">
                 {{ lay.name }}
             </div>
             <div class="container-header so-very-thin so-upper">Annet</div>
