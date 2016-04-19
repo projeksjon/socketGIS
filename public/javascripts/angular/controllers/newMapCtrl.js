@@ -2,7 +2,7 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 
-socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', '$cookies','socket', 'FileService','leafletData', 'jwtHelper',function ($scope, $http, $timeout, $routeParams, $cookies, socket, FileService, leafletData, jwtHelper) {
+socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams', '$cookies', 'socket', 'FileService', 'leafletData', 'jwtHelper', function ($scope, $http, $timeout, $routeParams, $cookies, socket, FileService, leafletData, jwtHelper) {
     var fileId = $routeParams.fileId;
 
     $scope.username = jwtHelper.decodeToken($cookies.get('token')).username;
@@ -18,11 +18,11 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         zoom: 12
     };
     var drawnItems = new L.FeatureGroup();
-    $scope.controls ={
+    $scope.controls = {
         draw: {
             position: 'topright',
             draw: {},
-            edit: { featureGroup: drawnItems}
+            edit: {featureGroup: drawnItems}
         }
     };
     $scope.selectedFeature;
@@ -52,11 +52,6 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
             layers.eachLayer(function (layer) {
             });
         });
-
-        map.on('click', function (e) {
-            console.log(e.target);
-            $scope.selectedFeature.resetStyle(e.target)
-        })
     });
 
     $scope.layers = {
@@ -77,7 +72,7 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     };
 
     // Chat
-    $scope.pushMessage = function() {
+    $scope.pushMessage = function () {
         msg = {}
         msg.message = $scope.newMessage;
         msg.id = $routeParams.fileId;
@@ -87,20 +82,24 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     }
 
     $scope.activeLayers;
-
+    var geoList;
     socket.emit('getFileLayers', fileId);
-    $scope.$on('socket:file layers', function(ev, data){
+    $scope.$on('socket:file layers', function (ev, data) {
         $scope.activeLayers = data;
         $scope.activeLayers.forEach(function (layer) {
             var features = layer.features;
             var geolay = L.geoJson(features, {
-                onEachFeature: function (feature, layer) {
+                style: {
+                    "opacity": 1
+                },
+                onEachFeature: function (feature, lay) {
                     var popupInfo = "";
                     var prop = feature.properties;
+                    feature.properties.parentLayer = layer._id;
                     Object.keys(prop).forEach(function (key, index) {
-                        popupInfo += "<p>"+key + ": "+prop[key] +"</p>"
+                        popupInfo += "<p>" + key + ": " + prop[key] + "</p>"
                     });
-                    layer.bindPopup(popupInfo);
+                    //lay.bindPopup(popupInfo);
                 }
             });
             geolay.on('click', highlightFeature);
@@ -111,17 +110,17 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         $scope.activeLayers[0].isActive = true;
     });
 
-    $scope.$on('socket:add feature', function(ev, data) {
+    $scope.$on('socket:add feature', function (ev, data) {
         console.log(data);
         L.geoJson(data).addTo($scope.map);
     });
 
     socket.emit('join room', $routeParams.fileId);
 
-    $scope.$on('socket:chat message', function(ev, msg) {
+    $scope.$on('socket:chat message', function (ev, msg) {
         msg.is_owner = msg.owner == $scope.username;
         $scope.chatMessages.push(msg);
-        $timeout(function() {
+        $timeout(function () {
             var scroller = document.getElementById("autoscroll");
             scroller.scrollTop = scroller.scrollHeight;
         }, 0, false);
@@ -132,10 +131,10 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         $scope.show.slider = (!$scope.show.slider);
     };
 
-    $scope.toggle = function(type) {
+    $scope.toggle = function (type) {
         $scope.show[type] = $scope.show[type] ? false : true;
     };
-    $scope.addLayer = function(){
+    $scope.addLayer = function () {
         socket.emit('add layer', $scope.newLayerName, $routeParams.fileId);
         //Reset name
         $scope.newLayerName = '';
@@ -145,12 +144,12 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     //File upload functions, used with ng-file-upload
     $scope.$watch('file', function () {
         if ($scope.file != null) {
-            FileService.handleFile($scope.file).then(function(data){
+            FileService.handleFile($scope.file).then(function (data) {
                 fileData = data;
                 fileData.forEach(function (collection) {
 
                     var name = collection.fileName;
-                    if (name === undefined || name === null){
+                    if (name === undefined || name === null) {
                         name = "1234"
                     }
 
@@ -158,44 +157,90 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
                     socket.emit('add layer', name, fileId, collection);
 
                     var myStyle = {
-                        "color": '#'+Math.floor(Math.random()*16777215).toString(16),
+                        "color": '#' + Math.floor(Math.random() * 16777215).toString(16),
                         "opacity": 1
                     };
                     L.geoJson(collection, {
                         style: myStyle,
                         onEachFeature: function (feature, layer) {
                             console.log(layer);
-                            if(feature.properties){
+                            if (feature.properties) {
                                 console.log(feature.properties);
                                 layer.bindPopup("Hei på deg!!");
                             }
                         }
                     }).addTo($scope.map);
-
-                    console.log(collection);
                 });
             });
         }
     });
 
-    $scope.deleteSelected = function () {
+    $scope.deleteSelectedFeature = function () {
+        if($scope.featureList.length<1){
+            alert("Ingen element er valgt!")
+        }
+        $scope.featureList.forEach(function (f) {
+            $scope.map.removeLayer(f)
+        });
+    };
+
+    $scope.deleteSelectedLayer = function () {
         $scope.activeLayers.forEach(function (layer) {
-            if(layer.isActive){
+            if (layer.isActive) {
                 $scope.map.removeLayer(layer.geoLayers)
                 socket.emit('delete layer', layer._id)
             }
         });
-    };
+    }
 
     $scope.updateSelected = function () {
         $scope.activeLayers.forEach(function (layer) {
-            if(layer.isActive){
+            if (layer.isActive) {
                 console.log("update");
                 console.log(layer);
                 //socket.emit('update layer', layer)
             }
         });
     };
+
+
+    $scope.bufferSelected = function () {
+        socket.emit('make buffer', $scope.featureList[0].toGeoJSON());
+    };
+
+    $scope.$on('socket:done buffering', function (ev, obj) {
+        console.log(obj);
+        $scope.activeLayers.forEach(function (layer) {
+            if (layer._id === obj.parentLayer) {
+                console.log(layer);
+                layer.geoLayers.addData(obj.geoJson);
+            }
+        });
+        //oJson(geoJson).addTo($scope.map);
+    });
+
+
+    $scope.intersectSelected = function () {
+        if ($scope.featureList.length > 2) {
+            alert("Du kan kun ha to aktive lag for å velge intersection.")
+            return
+        } else if ($scope.featureList.length < 2) {
+            alert("Du må velge to lag som skal brukes for intersect.")
+            return
+        }
+        var obj = {
+            id: fileId,
+            first: $scope.featureList[0].toGeoJSON(),
+            second: $scope.featureList[0].toGeoJSON()
+        };
+        socket.emit('make intersection', obj)
+    }
+
+    $scope.$on('socket:done intersection', function (ev, obj) {
+        console.log(obj);
+        L.geoJson(obj).addTo($scope.map);
+
+    });
 
     $scope.selectLayer = function (newLayer) {
 
@@ -204,20 +249,36 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
         });
         newLayer.isActive = true;
     };
-
+    $scope.featureList = [];
     function highlightFeature(e) {
         var layer = e.layer;
-        $scope.selectedFeature = layer;
-
-        layer.setStyle({
-            weight: 5,
-            color: '#666',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
+        console.log(layer);
+        if (layer.feature.properties.isSelected) {
+            $scope.selectedFeature = null;
+            layer.feature.properties.isSelected = false;
+        }
+        var index = $scope.featureList.indexOf(layer);
+        if (index >= 0) {
+            $scope.featureList.splice(index, 1);
+            layer.setStyle({
+                "opacity": 1
+            });
+            return;
+        } else {
+            $scope.featureList.push(layer);
+            layer.setStyle({
+                "opacity": 0.5
+            });
+            return;
+        }
 
         if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
         }
+        $scope.selectedFeature = layer;
+        layer.feature.properties.isSelected = true;
+        layer.setStyle({
+            "opacity": 0.5
+        });
     }
 }]);

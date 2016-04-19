@@ -18,6 +18,7 @@ socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactor
     socket.forward('all polys');
     socket.forward('new point');
     socket.forward('done buffering');
+    socket.forward('done intersection');
     socket.forward('added layer');
     socket.forward('file layers');
     socket.forward('layer update');

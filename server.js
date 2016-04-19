@@ -11,6 +11,7 @@ var jsts = require('jsts');
 var passport = require('passport');
 var jwt = require('jwt-simple');
 var socketioJwt = require('socketio-jwt');
+var turf = require('turf');
 
 //Mongoose
 mongoose.connect('mongodb://socketgis:socketgis@ds055885.mongolab.com:55885/socketgis');
@@ -118,7 +119,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('make buffer', function(features) {
-        makeBuffer(features);
+        makeBuffer(features, 10);
     });
 
     socket.on('make intersection', function(features) {
@@ -201,14 +202,15 @@ io.on('connection', function (socket) {
     });
 
     socket.on('add layer', function (layerName, fileId, features) {
+        var obj;
         if (features != null) {
             console.log("features");
-            var obj = {
+            obj = {
                 name: layerName,
                 features: features
             }
         } else {
-            var obj = {
+            obj = {
                 name: layerName,
             }
         }
@@ -262,17 +264,19 @@ var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
 function makeBuffer(feature, distance) {
-    var jstsGeom = reader.read(feature).geometry;
-    var buffered = jstsGeom.buffer(distance);
-    io.emit('done buffering', JSON.stringify(writer.write(buffered)));
+    var parentLayer = feature.properties.parentLayer;
+    var bufferd = turf.buffer(feature, 500, 'meters');
+    var obj = {
+        geoJson: bufferd,
+        parentLayer: parentLayer
+    };
+    io.emit('done buffering', obj);
 }
 
 function intersect(features) {
-    var id = features[0].id;
-    var a = reader.read(features[0]).geometry;
-    var b = reader.read(features[1]).geometry;
-    var intersection = a.intersection(b);
-    io.to(id).emit('done intersection', JSON.stringify(writer.write(intersection)));
+    var id = features.id;
+    var intersection = turf.intersect(features.first, features.second);
+    io.to(id).emit('done intersection', intersection);
 }
 
 function difference(features) {

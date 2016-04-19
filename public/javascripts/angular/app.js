@@ -1,4 +1,4 @@
-var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies', 'btford.socket-io', 'ngFileUpload', 'leaflet-directive', 'angular-jwt']);
+var socketGis = angular.module("socketGis", ['ngRoute', 'ngCookies', 'btford.socket-io', 'ngFileUpload', 'leaflet-directive', 'angular-jwt', 'ui.bootstrap']);
 
 socketGis.config(function($routeProvider) {
     $routeProvider
