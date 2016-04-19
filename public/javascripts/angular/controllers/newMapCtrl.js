@@ -33,7 +33,10 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
             var layer = e.layer, type = e.layerType;
             drawnItems.addLayer(layer);
 
+            console.log(type);
+
             var geoJSON = layer.toGeoJSON();
+            console.log(geoJSON);
             if (type === "circle") {
                 var radius = layer.getRadius();
                 geoJSON.properties.radius = radius;
@@ -52,7 +55,7 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
             layers.eachLayer(function (layer) {
             });
         });
-    })
+    });
 
     $scope.layers = {
         baselayers: {
