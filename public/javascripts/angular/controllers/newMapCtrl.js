@@ -179,7 +179,30 @@ socketGis.controller("newMapCtrl", ['$scope','$http','$timeout','$routeParams', 
     });
 
     $scope.deleteSelected = function () {
-        $scope.map.removeLayer($scope.selectedFeature)
+        $scope.activeLayers.forEach(function (layer) {
+            if(layer.isActive){
+                $scope.map.removeLayer(layer.geoLayers)
+                socket.emit('delete layer', layer._id)
+            }
+        });
+    };
+
+    $scope.updateSelected = function () {
+        $scope.activeLayers.forEach(function (layer) {
+            if(layer.isActive){
+                console.log("update");
+                console.log(layer);
+                //socket.emit('update layer', layer)
+            }
+        });
+    };
+
+    $scope.selectLayer = function (newLayer) {
+
+        $scope.activeLayers.forEach(function (layer) {
+            layer.isActive = false;
+        });
+        newLayer.isActive = true;
     };
 
     function highlightFeature(e) {

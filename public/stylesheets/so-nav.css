@@ -99,6 +99,8 @@
         letter-spacing: 3px;
         padding: 0 15px;
         border-bottom: 1px solid #555; }
+      .so-side-nav-small .so-side-nav-small-slider .so-side-nav-small-slider-container .activeLayer {
+        background: #3a3a3a; }
       .so-side-nav-small .so-side-nav-small-slider .so-side-nav-small-slider-container .container-field {
         position: relative;
         width: 100%;

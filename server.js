@@ -227,6 +227,12 @@ io.on('connection', function (socket) {
             }
         )
     })
+
+    socket.on('delete layer', function (id) {
+        Layer.remove({_id: id}, function (err, p) {
+            if (err) console.log(err);
+        });
+    })
 });
 
 //===================GIS Methods===================

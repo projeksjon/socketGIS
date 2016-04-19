@@ -5,16 +5,18 @@
     <div class="so-side-nav-small-slider slide-right" ng-show="show.slider">
         <div class="so-side-nav-small-slider-header so-white so-center">H j e m</div>
         <div class="so-side-nav-small-slider-container">
-            <div class="container-field" ng-click="deleteSelected()">Slett valgte objekter</div>
+            <div class="container-field" ng-click="deleteSelected()">Slett valgt lag</div>
+            <div class="container-field" ng-click="updateSelected()">Oppdater valgt lag</div>
             <div class="container-header so-very-thin so-upper">Lag</div>
             <div class="container-field" ng-click="toggle('addLayer')" ng-hide="show.addLayer">Legg til lag</div>
             <div class="container-input" ng-show="show.addLayer">
                 <input class="form-control" type="text" ng-model="newLayerName" placeholder="Navn">
                 <button class="btn-default" ng-click="addLayer()">Legg til</button>
             </div>
-            <div class="container-field" ng-repeat="lay in activeLayers" ng-class="{'container-sub-fields-active': lay.isActive}">
+            <div class="container-field" ng-repeat="lay in activeLayers" ng-class="{'activeLayer': lay.isActive}" ng-click="selectLayer(lay)">
                 {{ lay.name }}
             </div>
+
             <div class="container-header so-very-thin so-upper">Annet</div>
             <div ng-controller="logoutController"><div class="container-field" ng-click='logout()'>Logg ut</div></div>
         </div>
