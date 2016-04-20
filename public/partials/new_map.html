@@ -7,12 +7,9 @@
         <div class="so-side-nav-small-slider-container">
             <div class="container-field" ng-click="deleteSelectedLayer()">Slett valgt lag</div>
             <div class="container-field" ng-click="bufferSelected()">Oppdater valgt lag</div>
+            <div class="container-field" ng-click="putOnTopSelected()">Legg øverst</div>
             <div class="container-header so-very-thin so-upper">Lag</div>
-            <div class="container-field" ng-click="toggle('addLayer')" ng-hide="show.addLayer">Legg til lag</div>
-            <div class="container-input" ng-show="show.addLayer">
-                <input class="form-control" type="text" ng-model="newLayerName" placeholder="Navn">
-                <button class="btn-default" ng-click="addLayer()">Legg til</button>
-            </div>
+            <div class="container-field" data-toggle="modal" data-target="#geoJsonModal">Legg til lag</div>
             <div class="container-field" ng-repeat="lay in activeLayers" ng-class="{'activeLayer': lay.isActive}" ng-click="selectLayer(lay)">
                 {{ lay.name }}
             </div>
@@ -24,8 +21,7 @@
             <div class="container-field" ng-click="intersectSelected()">Intersection</div>
             <div class="container-field" ng-click="differenceSelected()">Difference</div>
             <div class="container-field" ng-click="unionSelected()">Union</div>
-            <div class="container-field">Symmentric difference</div>
-            <div class="container-field">Buffer</div>
+            <div class="container-field" ng-click="tinSelected()">TIN (Punktlag)</div>
 
             <div class="container-header so-very-thin so-upper">Annet</div>
             <div ng-controller="logoutController"><div class="container-field" ng-click='logout()'>Logg ut</div></div>
@@ -69,21 +65,22 @@
     </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="intersectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="geoJsonModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="intersectionModalLabel">Buffer</h4>
+                <h4 class="modal-title" id="geoJsonModalLabel">Legg til geoJSON</h4>
             </div>
             <div class="modal-body">
-                <p>{{ selectedFeature.feature.properties }}</p>
-                <p></p>
+                <input type="text" ng-model="newGeoJsonLayerName" placeholder="Lagnavn">
+                <textarea name="geojson" id="geojson" cols="60" rows="10" ng-model="newGeoJsonLayer"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" ng-click="bufferSelected()">Buffer</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="addGeoJsonLayer()">Legg til som lag</button>
             </div>
         </div>
     </div>
 </div>
+

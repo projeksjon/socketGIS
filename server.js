@@ -134,9 +134,11 @@ io.on('connection', function (socket) {
         union(obj);
     });
 
-    socket.on('make symDifference', function (features) {
-        symDifference(features);
+    socket.on('make TIN', function (features, fileId) {
+         TIN(features, fileId);
+
     });
+
 
     socket.on('add point', function (point) {
         Point.create({loc: {type: 'Point', coordinates: point.geometry.coordinates}}, function (err, point) {
@@ -223,9 +225,9 @@ io.on('connection', function (socket) {
                 {safe: true, new: true},
                 function (err, model) {
                     if (err) console.log(err);
-                    io.emit('added layer', model);
                 }
             );
+            io.to(fileId).emit('added layer', layer)
         })
     });
 
@@ -256,13 +258,31 @@ io.on('connection', function (socket) {
             console.log("deleted layer");
         });
     })
+
+
+    socket.on('add geojsonlayer', function (featureCollection, name, fileId) {
+
+        var newLay = {
+            name: name,
+            features: featureCollection.features
+        };
+        Layer.create(newLay, function (err, layer) {
+            console.log("added geojsonlayer");
+
+            File.findByIdAndUpdate(
+                fileId,
+                {$push: {"layers": layer}},
+                {safe: true, new: true},
+                function (err, model) {
+                    if (err) console.log(err);
+                }
+            );
+            io.to(fileId).emit('new geojsonlayer', layer);
+        });
+    })
 });
 
 //===================GIS Methods===================
-
-//JSTS parser to read geojson ++
-var reader = new jsts.io.GeoJSONReader();
-var writer = new jsts.io.GeoJSONWriter();
 
 function makeBuffer(feature, distance, fileId) {
     var bufferd = turf.buffer(feature, distance, 'meters');
@@ -362,10 +382,29 @@ function union(obj) {
     });
 }
 
-function symDifference(features) {
-    var id = features[0].id;
-    var a = reader.read(features[0]).geometry;
-    var b = reader.read(features[1]).geometry;
-    var symDifference = a.symDifference(b);
-    io.to(id).emit('done union', JSON.stringify(writer.write(symDifference)));
+function TIN(features, fileId){
+    var obj = {
+        type: 'FeatureCollection',
+        features: features
+    };
+    var tin = turf.tin(obj);
+    var newLay = {
+        name: "TINlayer",
+        features: tin.features
+    };
+
+    Layer.create(newLay, function (err, layer) {
+        if (err) console.log(err);
+        console.log("added unionlayer");
+
+        File.findByIdAndUpdate(
+            fileId,
+            {$push: {"layers": layer}},
+            {safe: true, new: true},
+            function (err, model) {
+                if (err) console.log(err);
+            }
+        );
+        io.to(fileId).emit('done TIN', layer);
+    });
 }

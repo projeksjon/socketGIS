@@ -28,6 +28,8 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
     $scope.selectedFeature;
     $scope.selectedLayer;
 
+    $scope.drawPoints = L.geoJson();
+
     $scope.map;
     leafletData.getMap().then(function (map) {
         $scope.map = map;
@@ -35,12 +37,17 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         drawnItems.addTo(map);
         map.on('draw:created', function (e) {
             var layer = e.layer;
-            drawnItems.addLayer(layer);
-
+            //drawnItems.addLayer(layer);
             var geoJSON = layer.toGeoJSON();
             geoJSON.id = $routeParams.fileId;
+            //socket.emit('add feature', geoJSON);
+            switch (geoJSON.geometry.type) {
+                case "Point":
+                    $scope.drawPoints.addData(geoJSON);
+            }
 
-            socket.emit('add feature', geoJSON);
+            console.log(geoJSON);
+
         });
         map.on('draw:edited', function (e) {
             var layers = e.layers;
@@ -85,7 +92,6 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
     }
 
     $scope.activeLayers;
-    var geoList;
     socket.emit('getFileLayers', fileId);
     $scope.$on('socket:file layers', function (ev, data) {
         $scope.activeLayers = data;
@@ -97,13 +103,10 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
                     "color": '#' + Math.floor(Math.random() * 16777215).toString(16)
                 },
                 onEachFeature: function (feature, lay) {
-                    var popupInfo = "";
-                    var prop = feature.properties;
+                    if(feature.properties == null) {
+                        feature.properties = {};
+                    }
                     feature.properties.parentLayer = layer._id;
-                    Object.keys(prop).forEach(function (key, index) {
-                        popupInfo += "<p>" + key + ": " + prop[key] + "</p>"
-                    });
-                    //lay.bindPopup(popupInfo);
                 }
             });
             geolay.on('click', highlightFeature);
@@ -139,12 +142,6 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
     $scope.toggle = function (type) {
         $scope.show[type] = $scope.show[type] ? false : true;
     };
-    $scope.addLayer = function () {
-        socket.emit('add layer', $scope.newLayerName, $routeParams.fileId);
-        //Reset name
-        $scope.newLayerName = '';
-        $scope.toggle('addLayer');
-    };
     var fileData;
     //File upload functions, used with ng-file-upload
     $scope.$watch('file', function () {
@@ -157,17 +154,8 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
                     if (name === undefined || name === null) {
                         name = "1234"
                     }
-
                     // Add a layer for each
                     socket.emit('add layer', name, fileId, collection);
-
-                    var myStyle = {
-                        "color": '#' + Math.floor(Math.random() * 16777215).toString(16),
-                        "opacity": 1
-                    };
-                    L.geoJson(collection, {
-                        style: myStyle
-                    }).addTo($scope.map);
                 });
             });
         }
@@ -348,4 +336,40 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         $scope.selectedFeature = null;
     }
 
+    $scope.addGeoJsonLayer = function () {
+        var json = JSON.parse($scope.newGeoJsonLayer);
+        if(json.type === "FeatureCollection"){
+            socket.emit('add geojsonlayer', json, $scope.newGeoJsonLayerName, fileId);
+        }else {
+            alert("Laget må være en featurecollection")
+        }
+    }
+    $scope.$on('socket:new geojsonlayer', function (ev, layer) {
+        addLayerToMap(layer);
+    });
+
+    $scope.tinSelected = function () {
+        $scope.activeLayers.forEach(function (layer) {
+            if (layer.isActive) {
+                socket.emit('make TIN', layer.features, fileId)
+            }
+        });
+    }
+    $scope.$on('socket:done TIN', function (ev, layer) {
+        addLayerToMap(layer);
+    });
+
+    $scope.$on('socket:added layer', function (ev, layer) {
+        addLayerToMap(layer);
+    });
+
+    $scope.putOnTopSelected = function () {
+        $scope.activeLayers.forEach(function (layer) {
+            if (layer.isActive) {
+                layer.geoLayers.bringToFront()
+            }else{
+                layer.geoLayers.bringToBack()
+            }
+        });
+    }
 }]);

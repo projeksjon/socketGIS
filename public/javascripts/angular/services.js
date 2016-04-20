@@ -26,6 +26,8 @@ socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactor
     socket.forward('layer update');
     socket.forward('chat message');
     socket.forward('add feature');
+    socket.forward('new geojsonlayer');
+    socket.forward('done TIN');
 
     return socket;
 }]);
