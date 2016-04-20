@@ -76,7 +76,7 @@
     bottom: 0;
     width: 300px;
     background: #333;
-    overflow: hidden;
+    overflow-y: scroll;
     -webkit-transition: all 500ms ease;
       -webkit-transition--moz-transition: all 500ms ease;
       -webkit-transition--ms-transition: all 500ms ease;

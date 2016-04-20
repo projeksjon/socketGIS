@@ -185,7 +185,9 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
     $scope.deleteSelectedLayer = function () {
         $scope.activeLayers.forEach(function (layer) {
             if (layer.isActive) {
-                $scope.map.removeLayer(layer.geoLayers)
+                if(layer.geoLayers != null){
+                    $scope.map.removeLayer(layer.geoLayers)
+                }
                 socket.emit('delete layer', layer._id)
 
                 var i = $scope.activeLayers.indexOf(layer);
@@ -210,15 +212,8 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         $scope.unselectAll();
     };
 
-    $scope.$on('socket:done buffering', function (ev, obj) {
-        console.log(obj);
-        $scope.activeLayers.forEach(function (layer) {
-            if (layer._id === obj.parentLayer) {
-                console.log(layer);
-                layer.geoLayers.addData(obj.geoJson);
-            }
-        });
-        //oJson(geoJson).addTo($scope.map);
+    $scope.$on('socket:done buffering', function (ev, layer) {
+        addLayerToMap(layer)
     });
 
 
@@ -233,10 +228,10 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         var obj = {
             id: fileId,
             first: $scope.featureList[0].toGeoJSON(),
-            second: $scope.featureList[0].toGeoJSON()
+            second: $scope.featureList[1].toGeoJSON()
         };
         socket.emit('make intersection', obj)
-    }
+    };
 
     $scope.differenceSelected = function () {
         if ($scope.featureList.length > 2) {
@@ -249,59 +244,58 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         var obj = {
             id: fileId,
             first: $scope.featureList[0].toGeoJSON(),
-            second: $scope.featureList[0].toGeoJSON()
+            second: $scope.featureList[1].toGeoJSON()
         };
         socket.emit('make difference', obj)
     }
     $scope.unionSelected = function () {
         if ($scope.featureList.length > 2) {
-            alert("Du kan kun ha to aktive lag for å velge difference.")
+            alert("Du kan kun ha to aktive lag for å velge union.")
             return
         } else if ($scope.featureList.length < 2) {
-            alert("Du må velge to lag som skal brukes for difference.")
+            alert("Du må velge to lag som skal brukes for union.")
             return
         }
         var obj = {
             id: fileId,
             first: $scope.featureList[0].toGeoJSON(),
-            second: $scope.featureList[0].toGeoJSON()
+            second: $scope.featureList[1].toGeoJSON()
         };
         socket.emit('make union', obj)
     }
 
-    $scope.$on('socket:done difference', function (ev, obj) {
-        console.log(obj);
-        var myStyle = {
-            "color": '#ffa500',
-            "opacity": 1
-        };
-        L.geoJson(obj, {
-            style: myStyle,
-        }).addTo($scope.map);
-
+    $scope.$on('socket:done difference', function (ev, layer) {
+        addLayerToMap(layer)
     });
-    $scope.$on('socket:done union', function (ev, obj) {
-        console.log(obj);
-        var myStyle = {
-            "color": '#ffa500',
-            "opacity": 1
-        };
-        L.geoJson(obj, {
-            style: myStyle,
-        }).addTo($scope.map);
-
+    $scope.$on('socket:done union', function (ev, layer) {
+        addLayerToMap(layer);
     });
 
-    $scope.$on('socket:done intersection', function (ev, obj) {
-        console.log(obj);
-        var myStyle = {
-            "color": '#ffa500',
-            "opacity": 1
-        };
-        L.geoJson(obj, {
-            style: myStyle,
-        }).addTo($scope.map);
 
+    function addLayerToMap(layer) {
+        console.log(layer);
+        // Add the new layer to the list
+        $scope.activeLayers.push(layer);
+        var features = layer.features;
+        var geolay = L.geoJson(features, {
+            style: {
+                "opacity": 1,
+                "color": '#' + Math.floor(Math.random() * 16777215).toString(16)
+            },
+            onEachFeature: function (feature, lay) {
+                if(feature.properties == null) {
+                    feature.properties = {};
+                }
+                feature.properties.parentLayer = layer._id;
+            }
+        });
+        geolay.on('click', highlightFeature);
+        geolay.addTo($scope.map);
+        layer.geoLayers = geolay;
+    }
+
+    $scope.$on('socket:done intersection', function (ev, layer) {
+        addLayerToMap(layer);
     });
 
     $scope.selectLayer = function (newLayer) {

@@ -118,23 +118,23 @@ io.on('connection', function (socket) {
         console.log('Added geofeature');
     });
 
-    socket.on('make buffer', function(features, distance, fileId) {
+    socket.on('make buffer', function (features, distance, fileId) {
         makeBuffer(features, distance, fileId);
     });
 
-    socket.on('make intersection', function(obj) {
+    socket.on('make intersection', function (obj) {
         intersect(obj);
     });
 
-    socket.on('make difference', function(obj) {
+    socket.on('make difference', function (obj) {
         difference(obj);
     });
 
-    socket.on('make union', function(obj) {
+    socket.on('make union', function (obj) {
         union(obj);
     });
 
-    socket.on('make symDifference', function(features) {
+    socket.on('make symDifference', function (features) {
         symDifference(features);
     });
 
@@ -253,6 +253,7 @@ io.on('connection', function (socket) {
     socket.on('delete layer', function (id) {
         Layer.remove({_id: id}, function (err, p) {
             if (err) console.log(err);
+            console.log("deleted layer");
         });
     })
 });
@@ -264,31 +265,101 @@ var reader = new jsts.io.GeoJSONReader();
 var writer = new jsts.io.GeoJSONWriter();
 
 function makeBuffer(feature, distance, fileId) {
-    var parentLayer = feature.properties.parentLayer;
     var bufferd = turf.buffer(feature, distance, 'meters');
-    var obj = {
-        geoJson: bufferd,
-        parentLayer: parentLayer
+    console.log(bufferd);
+
+    var newLay = {
+        name: "Bufferlayer",
+        features: bufferd.features
     };
-    io.to(fileId).emit('done buffering', obj);
+
+    Layer.create(newLay, function (err, layer) {
+        console.log("added bufferlayer");
+
+        File.findByIdAndUpdate(
+            fileId,
+            {$push: {"layers": layer}},
+            {safe: true, new: true},
+            function (err, model) {
+                if (err) console.log(err);
+            }
+        );
+        io.to(fileId).emit('done buffering', layer);
+    });
 }
 
 function intersect(obj) {
     var id = obj.id;
     var intersection = turf.intersect(obj.first, obj.second);
-    io.to(id).emit('done intersection', intersection);
+    var newLay = {
+        name: "IntersectLayer",
+        features: [intersection]
+    };
+
+    Layer.create(newLay, function (err, layer) {
+        if (err) console.log(err);
+        console.log("added intersectionlayer");
+
+        File.findByIdAndUpdate(
+            id,
+            {$push: {"layers": layer}},
+            {safe: true, new: true},
+            function (err, model) {
+                if (err) console.log(err);
+            }
+        );
+        io.to(id).emit('done intersection', layer);
+    });
 }
 
 function difference(obj) {
     var id = obj.id;
     var difference = turf.difference(obj.first, obj.second)
-    io.to(id).emit('done difference', difference);
+    var newLay = {
+        name: "Differencelayer",
+        features: difference.features
+    };
+
+    Layer.create(newLay, function (err, layer) {
+        if (err) console.log(err);
+        console.log("added intersectionlayer");
+
+        File.findByIdAndUpdate(
+            id,
+            {$push: {"layers": layer}},
+            {safe: true, new: true},
+            function (err, model) {
+                if (err) console.log(err);
+            }
+        );
+        io.to(id).emit('done difference', layer);
+    });
 }
 
 function union(obj) {
     var id = obj.id;
-    var union = turf.union(obj.first, obj.second)
-    io.to(id).emit('done union', union);
+    // returns a single polygon
+    var union = turf.union(obj.first, obj.second);
+    console.log(union);
+    var newLay = {
+        name: "Unionlayer",
+        features: [union]
+    };
+
+    Layer.create(newLay, function (err, layer) {
+        if (err) console.log(err);
+        console.log("added unionlayer");
+
+        File.findByIdAndUpdate(
+            id,
+            {$push: {"layers": layer}},
+            {safe: true, new: true},
+            function (err, model) {
+                if (err) console.log(err);
+            }
+        );
+        io.to(id).emit('done union', layer);
+    });
 }
 
 function symDifference(features) {
