@@ -5,7 +5,7 @@ socketGis.controller('navController', ['$scope', '$location', function($scope, $
     $scope.showNav = true;
 
     $scope.$on('$routeChangeStart', function (next, current) {
-        $scope.showNav = current.$$route.originalPath !== '/login';
+        $scope.showNav = !(current.$$route.originalPath == '/login' || current.$$route.originalPath == '/register');
     });
 
 }]);

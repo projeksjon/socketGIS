@@ -1,24 +1,22 @@
-<nav class="so-side-nav so-side-nav-small">
-    <button><i class = "glyphicon glyphicon-plus"></i></button>
-    <button><i class = "glyphicon glyphicon-comment"></i></button>
-    <button><i class = "glyphicon glyphicon-cog"></i></button>
-</nav>
-<div class="has-nav has-side-nav-small so-container">
-    <div class="col-sm-4 col-sm-offset-4 text-center">
-        <h1>Register brukeren din</h1>
-            <div ng-show="error" class="alert alert-danger">{{errorMessage}}</div>
-            <form class="form" ng-submit="register()">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" class="form-control" name="username" ng-model="registerForm.username" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" name="password" ng-model="registerForm.password" required>
-                </div>
-                <div>
-                    <button type="submit" class="btn btn-default" ng-disabled="disabled">Register</button>
-                </div>
-            </form>
+<div firefly class="so-container login-container" id="testId">
+    <div class="so-login-logo">
+        <img src="/images/socketGIS.png" alt="">
+    </div>
+    <div class="login-box">
+        <h1 class="so-very-thin so-upper so-white">Registrer deg</h1>
+        <div ng-show="error" class="alert alert-danger">{{errorMessage}}</div>
+        <form ng-submit="register()">
+            <div class="login-field">
+                <span class="fa fa-user"></span>
+                <input type="text" class="form-control" name="username" placeholder="Brukernavn" ng-model="registerForm.username" required>
+            </div>
+            <div class="login-field">
+                <span class="fa fa-lock"></span>
+                <input type="password" class="form-control" name="password" placeholder="Passord" ng-model="registerForm.password" required>
+            </div>
+            <div class="login-field">
+                <button type="submit" ng-disabled="disabled">Registrer</button>
+            </div>
+        </form>
     </div>
 </div>
