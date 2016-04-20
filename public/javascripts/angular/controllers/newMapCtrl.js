@@ -2,7 +2,7 @@
  * Created by rubenschmidt on 08.02.2016.
  */
 
-socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams', '$cookies', 'socket', 'FileService', 'leafletData', 'jwtHelper', function ($scope, $http, $timeout, $routeParams, $cookies, socket, FileService, leafletData, jwtHelper) {
+socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams', '$cookies', 'socket', 'FileService', 'leafletData', 'jwtHelper','$location', function ($scope, $http, $timeout, $routeParams, $cookies, socket, FileService, leafletData, jwtHelper, $location) {
     var fileId = $routeParams.fileId;
 
     $scope.username = jwtHelper.decodeToken($cookies.get('token')).username;
@@ -198,19 +198,8 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         });
     });
 
-    $scope.updateSelected = function () {
-        $scope.activeLayers.forEach(function (layer) {
-            if (layer.isActive) {
-                console.log("update");
-                console.log(layer);
-                //socket.emit('update layer', layer)
-            }
-        });
-    };
-
-
     $scope.bufferSelected = function () {
-        socket.emit('make buffer', $scope.featureList[0].toGeoJSON(), $scope.bufferDistance, fileId);
+        socket.emit('make buffer', $scope.featureList[0].toGeoJSON(), $scope.bufferDistance, fileId, $scope.bufferName);
         $scope.unselectAll();
     };
 
@@ -227,12 +216,13 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
             alert("Du må velge to lag som skal brukes for intersect.")
             return
         }
+        var name = prompt("Oppgi lagnavn", "Intersectlayer");
         var obj = {
             id: fileId,
             first: $scope.featureList[0].toGeoJSON(),
             second: $scope.featureList[1].toGeoJSON()
         };
-        socket.emit('make intersection', obj)
+        socket.emit('make intersection', obj, name)
     };
 
     $scope.differenceSelected = function () {
@@ -377,6 +367,15 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         addLayerToMap(layer);
     });
 
+    $scope.explodeSelected = function () {
+        socket.emit('make explosion', $scope.featureList[0].toGeoJSON(), fileId);
+        $scope.unselectAll();
+    }
+
+    $scope.$on('socket:done exploding', function (ev, layer) {
+        addLayerToMap(layer);
+    });
+
     $scope.putOnTopSelected = function () {
         $scope.activeLayers.forEach(function (layer) {
             if (layer.isActive) {
@@ -386,4 +385,31 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
             }
         });
     }
+
+
+    $scope.shareFile = function () {
+        var name = $scope.shareUsername;
+        if(name == null || name.length <1){
+            alert("Skriv et brukernavn");
+            return
+        }
+        console.log(name);
+        socket.emit('share file', name, fileId)
+    }
+
+    $scope.$on('socket:share success', function (ev, username) {
+        alert("Filen har blitt delt med "+username);
+    });
+
+    $scope.deleteFile = function (){
+        var answer = confirm("Vil du virkelig slette filen? All data vil gå tapt");
+        if (answer){
+            socket.emit('delete file', fileId);
+            $location.path('/');
+        }
+        else{
+            // Do nothing.
+        }
+    }
+
 }]);

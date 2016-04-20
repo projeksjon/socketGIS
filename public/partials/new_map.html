@@ -5,7 +5,6 @@
         <div class="so-side-nav-small-slider-header so-white so-center">H j e m</div>
         <div class="so-side-nav-small-slider-container">
             <div class="container-field" ng-click="deleteSelectedLayer()">Slett valgt lag</div>
-            <div class="container-field" ng-click="bufferSelected()">Oppdater valgt lag</div>
             <div class="container-field" ng-click="putOnTopSelected()">Legg øverst</div>
             <div class="container-header so-very-thin so-upper">Lag</div>
             <div class="container-field" data-toggle="modal" data-target="#geoJsonModal">Legg til lag</div>
@@ -15,12 +14,12 @@
 
             <div class="container-header so-very-thin so-upper">Operasjoner</div>
             <div class="container-field" ng-click="deleteSelectedFeature()">Slett valgt element</div>
-            <div class="container-field" ng-click="unselectAll()">Tøm valgte elementer</div>
             <div class="container-field" data-toggle="modal" data-target="#bufferModal">Buffer</div>
             <div class="container-field" ng-click="intersectSelected()">Intersection</div>
             <div class="container-field" ng-click="differenceSelected()">Difference</div>
             <div class="container-field" ng-click="unionSelected()">Union</div>
             <div class="container-field" ng-click="tinSelected()">TIN (Punktlag)</div>
+            <div class="container-field" ng-click="explodeSelected()">Eksploder lag</div>
 
         </div>
     </div>
@@ -28,6 +27,8 @@
         <div class="so-side-nav-small-slider-header so-white so-center">A n n e t</div>
         <div class="so-side-nav-small-slider-container">
             <div class="container-header so-very-thin so-upper">Annet</div>
+            <div class="container-field" data-toggle="modal" data-target="#shareModal">Del fil</div>
+            <div class="container-field" ng-click="deleteFile()">Slett fil</div>
             <div ng-controller="logoutController"><div class="container-field" ng-click='logout()'>Logg ut</div></div>
         </div>
     </div>
@@ -59,7 +60,8 @@
                 <h4 class="modal-title" id="bufferModalLabel">Buffer</h4>
             </div>
             <div class="modal-body">
-                <input type="number" ng-model="bufferDistance">
+                <input type="text" class="form-control" ng-model="bufferName" placeholder="Lagnavn">
+                <input type="number" class="form-control" ng-model="bufferDistance" placeholder="Avstand">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -77,7 +79,7 @@
                 <h4 class="modal-title" id="geoJsonModalLabel">Legg til geoJSON</h4>
             </div>
             <div class="modal-body">
-                <input type="text" ng-model="newGeoJsonLayerName" placeholder="Lagnavn">
+                <input type="text" class="form-control" ng-model="newGeoJsonLayerName" placeholder="Lagnavn">
                 <textarea name="geojson" id="geojson" cols="60" rows="10" ng-model="newGeoJsonLayer"></textarea>
             </div>
             <div class="modal-footer">
@@ -88,3 +90,20 @@
     </div>
 </div>
 
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="shareModalLabel">Del filen</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" ng-model="shareUsername" placeholder="Brukernavn">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="shareFile()">Del fil</button>
+            </div>
+        </div>
+    </div>
+</div>

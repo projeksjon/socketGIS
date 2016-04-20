@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 var cors = require('cors');
 var io = require('./io');
 var jsts = require('jsts');
@@ -93,13 +94,16 @@ function sendData() {
 // Socket connection found
 io.on('connection', function (socket) {
     console.log(socket.client.request.decoded_token.username, 'connected');
+
+
     socket.on('send files', function () {
-        File.find({}, function (err, files) {
-            if (err) {
-                console.log(err);
-            }
-            io.emit('all files', files);
-        })
+        File.find({owner: socket.client.request.decoded_token._id}).sort('-createdAt')
+            .exec(function (err, files) {
+                if (err) {
+                    console.log(err);
+                }
+                io.emit('all files', files);
+            })
     });
     socket.on('getFileLayers', function (fileId) {
         File.findById(fileId)
@@ -112,18 +116,27 @@ io.on('connection', function (socket) {
             });
     });
 
+    socket.on('getFilesSharedWithMe', function () {
+        File.find({ sharedWith:  Schema.ObjectId(socket.client.request.decoded_token._id)})
+            .exec(function (err, files) {
+                if (err) console.log(err);
+                console.log(files);
+                socket.emit('all files', files);
+        })
+    });
+
     socket.on('add feature', function (geoJson) {
         // Sendt polygon to all other listeners
         io.to(geoJson.id).emit('add feature', geoJson);
         console.log('Added geofeature');
     });
 
-    socket.on('make buffer', function (features, distance, fileId) {
-        makeBuffer(features, distance, fileId);
+    socket.on('make buffer', function (features, distance, fileId, name) {
+        makeBuffer(features, distance, fileId, name);
     });
 
-    socket.on('make intersection', function (obj) {
-        intersect(obj);
+    socket.on('make intersection', function (obj, name) {
+        intersect(obj, name);
     });
 
     socket.on('make difference', function (obj) {
@@ -135,8 +148,12 @@ io.on('connection', function (socket) {
     });
 
     socket.on('make TIN', function (features, fileId) {
-         TIN(features, fileId);
+        TIN(features, fileId);
 
+    });
+
+    socket.on('make explosion', function (feature, fileId) {
+        explode(feature, fileId)
     });
 
 
@@ -232,11 +249,11 @@ io.on('connection', function (socket) {
     });
 
     socket.on('create file', function (fileName) {
-        File.create({name: fileName, owner: socket.client.request.decoded_token}, function (err, file) {
+        File.create({name: fileName, owner: socket.client.request.decoded_token._id}, function (err, file) {
             if (err) {
                 console.log(err);
             }
-            console.log('created file');
+            console.log('created file' + fileName);
             socket.emit('created file', file);
         });
     });
@@ -281,16 +298,36 @@ io.on('connection', function (socket) {
             io.to(fileId).emit('new geojsonlayer', layer);
         });
     })
+
+    socket.on('share file', function (username, fileId) {
+        User.find({username: username}).exec(function (err, user) {
+            if(err) console.log(err);
+            console.log(user);
+            File.findByIdAndUpdate(
+                fileId,
+                {$push: {"sharedWith": user}},
+                {safe: true, new: true},
+                function (err, model) {
+                    if (err) console.log(err);
+                    console.log(model);
+                    io.to(fileId).emit('share success', username)
+                }
+            );
+        })
+    })
 });
 
 //===================GIS Methods===================
 
-function makeBuffer(feature, distance, fileId) {
+function makeBuffer(feature, distance, fileId, name) {
     var bufferd = turf.buffer(feature, distance, 'meters');
     console.log(bufferd);
+    if (name == null){
+        name = "Bufferlayer"
+    }
 
     var newLay = {
-        name: "Bufferlayer",
+        name: name,
         features: bufferd.features
     };
 
@@ -309,11 +346,14 @@ function makeBuffer(feature, distance, fileId) {
     });
 }
 
-function intersect(obj) {
+function intersect(obj, name) {
     var id = obj.id;
     var intersection = turf.intersect(obj.first, obj.second);
+    if (name == null){
+        name = "IntersectLayer"
+    }
     var newLay = {
-        name: "IntersectLayer",
+        name: name,
         features: [intersection]
     };
 
@@ -383,7 +423,32 @@ function union(obj) {
     });
 }
 
-function TIN(features, fileId){
+
+function explode(feature, fileId) {
+
+    var points = turf.explode(feature);
+    var newLay = {
+        name: "Exploded layer",
+        features: points.features
+    };
+
+    Layer.create(newLay, function (err, layer) {
+        console.log("added exploded layer");
+
+        File.findByIdAndUpdate(
+            fileId,
+            {$push: {"layers": layer}},
+            {safe: true, new: true},
+            function (err, model) {
+                if (err) console.log(err);
+            }
+        );
+        io.to(fileId).emit('done exploding', layer);
+    });
+
+}
+
+function TIN(features, fileId) {
     var obj = {
         type: 'FeatureCollection',
         features: features

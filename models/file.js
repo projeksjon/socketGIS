@@ -12,7 +12,10 @@ var File = Schema({
     sharedWith: [
         {type: Schema.Types.ObjectId, ref: 'user'}
     ],
-    layers: [{type: Schema.Types.ObjectId, ref:'layer'}]
+    layers: [{type: Schema.Types.ObjectId, ref:'layer'}],
+
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('file', File);
