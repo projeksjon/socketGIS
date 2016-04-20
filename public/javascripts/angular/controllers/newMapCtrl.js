@@ -76,10 +76,12 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
 
     $scope.show = {
         slider: false,
+        extra: false,
         interactionTypes: false,
         addLayer: false,
         chatWindow: false
     };
+
 
     // Chat
     $scope.pushMessage = function () {
@@ -137,7 +139,13 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
     // Functions
     $scope.toggleSlider = function () {
         $scope.show.slider = (!$scope.show.slider);
+        $scope.show.extra = false;
     };
+
+    $scope.toggleExtra = function () {
+        $scope.show.slider = false;
+        $scope.show.extra = (!$scope.show.extra);
+    }
 
     $scope.toggle = function (type) {
         $scope.show[type] = $scope.show[type] ? false : true;

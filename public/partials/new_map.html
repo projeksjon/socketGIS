@@ -1,7 +1,6 @@
 <nav class="so-side-nav so-side-nav-small">
     <button ng-click="toggleSlider()"><i class = "fa fa-home"></i></button>
-    <button ng-click="toggleSlider()"><i class = "fa fa-comment"></i></button>
-    <button ng-click="toggleSlider()"><i class = "fa fa-cog"></i></button>
+    <button ng-click="toggleExtra()"><i class = "fa fa-cog"></i></button>
     <div class="so-side-nav-small-slider slide-right" ng-show="show.slider">
         <div class="so-side-nav-small-slider-header so-white so-center">H j e m</div>
         <div class="so-side-nav-small-slider-container">
@@ -23,12 +22,17 @@
             <div class="container-field" ng-click="unionSelected()">Union</div>
             <div class="container-field" ng-click="tinSelected()">TIN (Punktlag)</div>
 
+        </div>
+    </div>
+    <div class="so-side-nav-small-slider slide-right" ng-show="show.extra">
+        <div class="so-side-nav-small-slider-header so-white so-center">A n n e t</div>
+        <div class="so-side-nav-small-slider-container">
             <div class="container-header so-very-thin so-upper">Annet</div>
             <div ng-controller="logoutController"><div class="container-field" ng-click='logout()'>Logg ut</div></div>
         </div>
     </div>
 </nav>
-<div class="has-nav has-side-nav-small so-container" ng-class="{'has-extended-side-nav-small':show.slider}">
+<div class="has-nav has-side-nav-small so-container" ng-class="{'has-extended-side-nav-small':show.slider || show.extra}">
     <leaflet controls="controls" layers="layers" center="center" defaults="defaults" ngf-drop ng-model="file" ngf-multiple="false"></leaflet>
     <div class="chat-box" ng-class="{'chat-box-open': show.chatWindow}">
         <div class="chat-header" ng-click="toggle('chatWindow')">Users (2)</div>
