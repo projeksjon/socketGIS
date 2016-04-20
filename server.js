@@ -252,12 +252,13 @@ io.on('connection', function (socket) {
         )
     })
 
-    socket.on('delete layer', function (id) {
+    socket.on('delete layer', function (id, fileId) {
         Layer.remove({_id: id}, function (err, p) {
             if (err) console.log(err);
             console.log("deleted layer");
+            io.to(fileId).emit('deleted layer', id)
         });
-    })
+    });
 
 
     socket.on('add geojsonlayer', function (featureCollection, name, fileId) {
