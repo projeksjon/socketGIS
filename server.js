@@ -315,6 +315,26 @@ io.on('connection', function (socket) {
             );
         })
     })
+
+    socket.on('save drawingAsLayer', function (features, name , fileId) {
+        var newLay = {
+            name: name,
+            features: features
+        };
+        Layer.create(newLay, function (err, layer) {
+            console.log("added drawlayer");
+
+            File.findByIdAndUpdate(
+                fileId,
+                {$push: {"layers": layer}},
+                {safe: true, new: true},
+                function (err, model) {
+                    if (err) console.log(err);
+                }
+            );
+            io.to(fileId).emit('draw saving success', layer);
+        });
+    })
 });
 
 //===================GIS Methods===================

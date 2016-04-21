@@ -8,6 +8,7 @@
             <div class="container-field" ng-click="putOnTopSelected()">Legg øverst</div>
             <div class="container-header so-very-thin so-upper">Lag</div>
             <div class="container-field" data-toggle="modal" data-target="#geoJsonModal">Legg til lag</div>
+            <div class="container-field" data-toggle="modal" data-target="#drawModal">Lagre tegning som lag</div>
             <div class="container-field" ng-repeat="lay in activeLayers" ng-class="{'activeLayer': lay.isActive}" ng-click="selectLayer(lay)">
                 {{ lay.name }}
             </div>
@@ -103,6 +104,24 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="shareFile()">Del fil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="drawModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="drawModalLabel">Lagre tegning</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" ng-model="drawName" placeholder="Navn">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveDrawingAsLayer()">Lagre tegning</button>
             </div>
         </div>
     </div>

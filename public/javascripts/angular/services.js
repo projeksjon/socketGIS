@@ -30,6 +30,8 @@ socketGis.factory('socket', ['socketFactory', '$cookies', function (socketFactor
     socket.forward('done TIN');
     socket.forward('deleted layer');
     socket.forward('done exploding');
+    socket.forward('draw saving success');
+
 
     return socket;
 }]);

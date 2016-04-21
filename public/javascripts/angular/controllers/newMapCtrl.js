@@ -27,28 +27,19 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
     };
     $scope.selectedFeature;
     $scope.selectedLayer;
-
-    $scope.drawPoints = L.geoJson();
-
+    $scope.drawLayer = L.geoJson();
+    $scope.drawFeatures = [];
     $scope.map;
+    var drawnItems;
     leafletData.getMap().then(function (map) {
         $scope.map = map;
-        var drawnItems = $scope.controls.draw.edit.featureGroup;
+        drawnItems = $scope.controls.draw.edit.featureGroup;
         drawnItems.addTo(map);
         map.on('draw:created', function (e) {
             var layer = e.layer;
-            //drawnItems.addLayer(layer);
-            var geoJSON = layer.toGeoJSON();
-            geoJSON.id = $routeParams.fileId;
-            //socket.emit('add feature', geoJSON);
-            switch (geoJSON.geometry.type) {
-                case "Point":
-                    $scope.drawPoints.addData(geoJSON);
-            }
-
-            console.log(geoJSON);
-
+            drawnItems.addLayer(layer);
         });
+
         map.on('draw:edited', function (e) {
             var layers = e.layers;
             layers.eachLayer(function (layer) {
@@ -410,6 +401,22 @@ socketGis.controller("newMapCtrl", ['$scope', '$http', '$timeout', '$routeParams
         else{
             // Do nothing.
         }
-    }
+    };
+
+    $scope.saveDrawingAsLayer = function () {
+        drawnItems.eachLayer(function (layer) {
+            console.log(layer);
+            var geoJSON = layer.toGeoJSON();
+            var features = [];
+            features.push(geoJSON);
+            socket.emit('save drawingAsLayer', features, $scope.drawName ,fileId)
+        })
+
+    };
+
+    $scope.$on('socket:draw saving success', function (ev, layer) {
+        addLayerToMap(layer)
+    });
+
 
 }]);
