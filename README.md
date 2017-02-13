@@ -1,11 +1,18 @@
 # socketGIS
 
-For å kjøyre med en gang, kjør følgende:
+Realtime collaboratio GIS application.
 
+Dependencies:
+
+Nodejs
+Mongodb
+Angular
+SocketIO
+
+To run the server just run:
 npm install
 
-Pass deretter på at du har mongodb kjørende på en eller annen port, den er spesifisert i server.js (linje 56)
+
+You need to start a mongoDB server also. Then change the url config for mongoDB in server.js (line 56)  
 mongodb://localhost:27017/gisdb
 
-
-GIS4LYFE
