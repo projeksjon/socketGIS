@@ -1,13 +1,8 @@
 # socketGIS
+Realtime collaboration GIS application.
 
-Realtime collaboratio GIS application.
+It uses the MEAN stack.
 
-Dependencies:
-
-Nodejs
-Mongodb
-Angular
-SocketIO
 
 To run the server just run:
 npm install
